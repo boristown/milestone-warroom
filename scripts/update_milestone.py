@@ -77,6 +77,9 @@ def main() -> int:
     ap.add_argument("--status", choices=sorted(VALID_STATUS))
     ap.add_argument("--note", help="Updated note (or projected_unlock on phase ID)")
     ap.add_argument("--metric", help="Updated metric pill (or summary_metric on phase ID)")
+    ap.add_argument("--add-phase", help="Append a new phase: engineId|phaseId|shortTitle|title")
+    ap.add_argument("--add-milestone", help="Append a new milestone: phaseId|msId|title")
+    ap.add_argument("--add-substep", help="Append a new substep: msId|subId|title")
     ap.add_argument("--engine-proj", help="Update engine projected score as engineId:score|delta|rank")
     ap.add_argument("--focus", help="Set engine focus as engineId:stepId")
     ap.add_argument("--bonus", help="Update engine bonus note as engineId:text")
@@ -98,6 +101,52 @@ def main() -> int:
 
     now = utc_now()
     changed = False
+
+    if args.add_phase:
+        parts = args.add_phase.split("|")
+        if len(parts) < 4:
+            print("ERROR: --add-phase requires engineId|phaseId|shortTitle|title", file=sys.stderr)
+            return 2
+        eng_id, ph_id, stitle, title = parts[0], parts[1], parts[2], parts[3]
+        for eng in data.get("engines", []):
+            if eng.get("id") == eng_id:
+                eng.setdefault("phases", []).append({
+                    "id": ph_id, "short_title": stitle, "title": title, "milestones": []
+                })
+                changed = True
+                break
+
+    if args.add_milestone:
+        parts = args.add_milestone.split("|")
+        if len(parts) < 3:
+            print("ERROR: --add-milestone requires phaseId|msId|title", file=sys.stderr)
+            return 2
+        ph_id, ms_id, title = parts[0], parts[1], parts[2]
+        for eng in data.get("engines", []):
+            for ph in eng.get("phases", []):
+                if ph.get("id") == ph_id:
+                    ph.setdefault("milestones", []).append({
+                        "id": ms_id, "title": title, "status": args.status or "queued",
+                        "started_utc": now if args.status == "active" else None, "completed_utc": None
+                    })
+                    changed = True
+                    break
+
+    if args.add_substep:
+        parts = args.add_substep.split("|")
+        if len(parts) < 3:
+            print("ERROR: --add-substep requires msId|subId|title", file=sys.stderr)
+            return 2
+        ms_id, sub_id, title = parts[0], parts[1], parts[2]
+        for eng in data.get("engines", []):
+            for _, ms in iter_milestones(eng):
+                if ms.get("id") == ms_id:
+                    ms.setdefault("substeps", []).append({
+                        "id": sub_id, "title": title, "status": args.status or "queued",
+                        "started_utc": now if args.status == "active" else None, "completed_utc": None
+                    })
+                    changed = True
+                    break
 
     if args.id:
         if not find_and_update(data, args.id, args.status, args.note, args.metric, now):

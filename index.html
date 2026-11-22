@@ -4,25 +4,20 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
-<title>MILESTONE WAR-ROOM // Live Telemetry</title>
+<title>WAR-ROOM // 进展看板</title>
 <style>
   :root {
     --bg: #050608;
-    --surface: #0b0e14;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-hi: rgba(255, 255, 255, 0.16);
+    --card: #0a0d13;
+    --line: rgba(255, 255, 255, 0.07);
+    --line-hi: rgba(255, 255, 255, 0.14);
     --text: #eef2f7;
-    --text-2: #94a3b8;
-    --text-3: #64748b;
+    --text-2: #8b9bb4;
+    --text-3: #526077;
     --cyan: #38bdf8;
-    --cyan-dim: rgba(56, 189, 248, 0.11);
     --indigo: #818cf8;
     --green: #34d399;
-    --green-dim: rgba(52, 211, 153, 0.12);
     --amber: #f59e0b;
-    --amber-dim: rgba(245, 158, 11, 0.12);
-    --red: #fb7185;
-    --radius: 14px;
     --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   }
@@ -34,251 +29,247 @@
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
-    background-image:
-      radial-gradient(60% 32% at 50% -10%, rgba(56, 189, 248, 0.06), transparent 70%);
   }
-
   .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px 18px 48px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 56px; }
 
   @keyframes spinSlow { to { transform: rotate(360deg); } }
-  @keyframes pulseCore {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .4; transform: scale(.78); }
-  }
-  @keyframes drawCheck {
-    from { stroke-dashoffset: 18; }
-    to { stroke-dashoffset: 0; }
-  }
-  @keyframes shimmerRail {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-  @keyframes flowWire {
-    from { stroke-dashoffset: 48; }
-    to { stroke-dashoffset: 0; }
-  }
-  @keyframes breatheBlock {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.62; }
-  }
-  @keyframes squeezeDown {
-    0%, 100% { transform: translateY(0); opacity: 0.95; }
-    50% { transform: translateY(3px); opacity: 0.45; }
-  }
+  @keyframes pulseSoft { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+  @keyframes wireFlow { from { stroke-dashoffset: 36; } to { stroke-dashoffset: 0; } }
+  @keyframes dropHint { 0%,100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(2.5px); opacity: .35; } }
   .svg-ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
-  .spin-orbit { transform-origin: 9px 9px; animation: spinSlow 6s linear infinite; }
-  .pulse-core { transform-origin: 9px 9px; animation: pulseCore 1.8s ease-in-out infinite; }
-  .clock-hand { transform-origin: 8px 8px; animation: spinSlow 18s linear infinite; }
-  .check-path { stroke-dasharray: 18; stroke-dashoffset: 0; animation: drawCheck .45s cubic-bezier(.22,1,.36,1) both; }
-  .wire-flow { stroke-dasharray: 4 12; animation: flowWire 2.4s linear infinite; }
-  .block-breathe { animation: breatheBlock 2.2s ease-in-out infinite; }
-  .squeeze-anim { animation: squeezeDown 1.7s ease-in-out infinite; }
+  .spin { transform-origin: 9px 9px; animation: spinSlow 7s linear infinite; }
+  .clock-hand { transform-origin: 8px 8px; animation: spinSlow 24s linear infinite; }
+  .pulse { animation: pulseSoft 2.2s ease-in-out infinite; }
+  .wire-flow { stroke-dasharray: 3 15; animation: wireFlow 2.8s linear infinite; }
+  .drop-hint { animation: dropHint 1.9s ease-in-out infinite; }
 
+  /* Auth Gate */
   .gate { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: 24px; }
   .gate.show { display: flex; }
-  .gate-card { width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px 24px; }
-  .gate-kicker { font-size: 11px; letter-spacing: 0.16em; color: var(--cyan); text-transform: uppercase; margin-bottom: 8px; }
-  .gate-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-  .gate-sub { font-size: 13px; color: var(--text-3); margin-bottom: 20px; }
-  .gate-input { width: 100%; background: #06080d; border: 1px solid var(--border-hi); border-radius: 10px; padding: 11px 13px; color: var(--text); font-family: var(--mono); font-size: 14px; outline: none; margin-bottom: 12px; }
+  .gate-card { width: 100%; max-width: 340px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; }
+  .gate-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; letter-spacing: 0.04em; }
+  .gate-input { width: 100%; background: #050608; border: 1px solid var(--line-hi); border-radius: 10px; padding: 11px 13px; color: var(--text); font-family: var(--mono); font-size: 14px; outline: none; margin-bottom: 12px; }
   .gate-input:focus { border-color: var(--cyan); }
-  .gate-btn { width: 100%; background: var(--text); color: #050608; border: none; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
-  .gate-btn:hover { opacity: .9; }
-  .gate-err { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
+  .gate-btn { width: 100%; background: var(--text); color: #050608; border: none; border-radius: 10px; padding: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+  .gate-err { color: #fb7185; font-size: 12px; margin-top: 10px; min-height: 16px; }
 
   #app { display: none; }
   #app.show { display: block; }
 
-  .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
-  .brand { display: flex; align-items: center; gap: 12px; }
-  .live-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 0.12em; font-weight: 600; color: var(--green); background: var(--green-dim); border: 1px solid rgba(52, 211, 153, 0.24); padding: 4px 10px 4px 7px; border-radius: 999px; }
-  .brand-title { font-size: 16px; font-weight: 600; letter-spacing: 0.04em; }
-  .brand-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  /* Whisper-Quiet Single-Line Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .score-flow { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .score-now { font-size: 14px; color: var(--text-2); display: inline-flex; align-items: center; gap: 7px; }
+  .score-now strong { color: var(--text); font-weight: 600; font-size: 16px; }
+  .score-arrow { color: var(--text-3); font-size: 13px; }
+  .score-proj { font-size: 14px; color: var(--text-2); display: inline-flex; align-items: baseline; gap: 9px; }
+  .score-proj strong { color: var(--green); font-size: 18px; font-weight: 600; }
+  .score-combo { color: var(--cyan); font-size: 12.5px; }
 
-  .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; gap: 2px; }
-  .seg button { background: transparent; border: none; color: var(--text-2); font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 7px; cursor: pointer; transition: all .15s; font-family: var(--sans); }
-  .seg button:hover { color: var(--text); }
-  .seg button.active { background: rgba(255, 255, 255, 0.1); color: var(--text); }
-  .icon-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-2); border-radius: 10px; padding: 6px 10px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color .15s, color .15s; }
-  .icon-btn:hover { border-color: var(--border-hi); color: var(--text); }
+  .controls { display: flex; align-items: center; gap: 8px; }
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 9px; padding: 2px; }
+  .seg button { background: transparent; border: none; color: var(--text-3); font-size: 12px; padding: 5px 11px; border-radius: 7px; cursor: pointer; font-family: var(--sans); transition: color .15s, background .15s; }
+  .seg button:hover { color: var(--text-2); }
+  .seg button.active { background: rgba(255,255,255,0.09); color: var(--text); }
 
-  .telemetry-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
-  @media (max-width: 860px) { .telemetry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
-  .stat.highlight { border-color: rgba(56, 189, 248, 0.26); background: linear-gradient(180deg, rgba(56, 189, 248, 0.055), var(--surface) 78%); }
-  .stat-label { font-size: 11px; color: var(--text-3); letter-spacing: 0.05em; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-  .stat-val { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
-  .stat.highlight .stat-val { color: var(--cyan); }
-  .stat-sub { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .inline-chip { display: inline-flex; align-items: center; gap: 4px; }
-  .tag-green { color: var(--green); }
-  .tag-cyan { color: var(--cyan); }
+  .sync-btn {
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--text-3);
+    border-radius: 9px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sync-btn:hover { color: var(--text); border-color: var(--line-hi); }
 
-  .engines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
-  @media (max-width: 960px) { .engines { grid-template-columns: 1fr; } }
-  .engine-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-  .engine-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .engine-code { font-size: 11px; letter-spacing: 0.14em; color: var(--cyan); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .engine-card[data-accent="indigo"] .engine-code { color: var(--indigo); }
-  .hb { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; letter-spacing: 0; color: var(--text-3); font-weight: 400; }
-  .hb.fresh { color: var(--green); }
-  .engine-name { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
-  .engine-meta { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+  /* Responsive Auto-Grid for Any Number of Engines */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
 
-  .proj-box { text-align: right; background: rgba(255, 255, 255, 0.025); border: 1px solid var(--border); border-radius: 11px; padding: 8px 12px; flex-shrink: 0; }
-  .proj-kicker { font-size: 10px; color: var(--text-3); letter-spacing: 0.06em; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-  .proj-score { font-size: 18px; font-weight: 700; color: var(--green); line-height: 1.25; }
-  .proj-delta { font-size: 11px; color: var(--text-2); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-  .circuit-box { background: linear-gradient(180deg, rgba(6, 9, 15, 0.92), rgba(9, 13, 21, 0.85)); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px 8px; }
-  .circuit-head { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--text-3); letter-spacing: 0.08em; margin-bottom: 4px; }
-  .circuit-legend { display: inline-flex; align-items: center; gap: 10px; font-size: 10px; }
-  .lg-item { display: inline-flex; align-items: center; gap: 4px; }
-  .lg-dot { width: 6px; height: 6px; border-radius: 50%; }
-  .circuit-svg { width: 100%; height: auto; display: block; }
-  .circuit-node { cursor: pointer; }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .card-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .card-proj {
+    font-size: 17.5px;
+    font-weight: 600;
+    color: var(--green);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .card-proj small { font-size: 11px; color: var(--text-3); font-weight: 400; }
 
-  .rail-wrap { display: flex; flex-direction: column; gap: 7px; }
-  .rail-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-2); }
-  .rail { display: flex; gap: 4px; height: 4px; }
-  .rail-seg { flex: 1; border-radius: 99px; background: rgba(255, 255, 255, 0.07); }
-  .rail-seg.done { background: var(--green); }
-  .rail-seg.active { background: linear-gradient(90deg, rgba(245,158,11,0.3), var(--amber), rgba(245,158,11,0.3)); background-size: 200% 100%; animation: shimmerRail 2.2s linear infinite; }
+  /* Floating Auto-Layout SVG Circuit */
+  .circuit { width: 100%; display: block; overflow: visible; }
+  .c-node { cursor: pointer; }
 
-  .focus-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--amber-dim); border: 1px solid rgba(245, 158, 11, 0.24); border-radius: 10px; padding: 9px 12px; font-size: 12px; }
-  .focus-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .focus-id { color: var(--amber); font-weight: 700; flex-shrink: 0; }
-  .focus-text { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .focus-time { display: inline-flex; align-items: center; gap: 4px; color: var(--amber); font-size: 11.5px; flex-shrink: 0; }
+  /* Pure Collapsible Milestone Tree */
+  .tree { display: flex; flex-direction: column; }
+  .phase { border-top: 1px solid var(--line); }
+  .phase:first-child { border-top: none; }
 
-  .phases { display: flex; flex-direction: column; gap: 8px; }
-  .phase { border: 1px solid var(--border); border-radius: 12px; background: rgba(255, 255, 255, 0.015); overflow: hidden; transition: border-color .15s; }
-  .phase.is-active { border-color: rgba(245, 158, 11, 0.24); }
-  .phase.is-done { border-color: rgba(52, 211, 153, 0.16); }
-  .phase-head { width: 100%; background: transparent; border: none; color: inherit; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; text-align: left; font-family: var(--sans); }
-  .phase-head:hover { background: rgba(255, 255, 255, 0.025); }
-  .phase-l { display: flex; align-items: center; gap: 11px; min-width: 0; }
-  .phase-title-wrap { min-width: 0; }
-  .phase-title { font-size: 13.5px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-  .phase-code { font-size: 11px; color: var(--text-3); font-weight: 500; }
-  .phase-sub { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
-  .phase-r { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .unlock-pill { font-size: 11px; color: var(--text-2); background: rgba(255, 255, 255, 0.035); border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px; }
-  .phase.is-active .unlock-pill { color: var(--cyan); border-color: rgba(56, 189, 248, 0.24); background: var(--cyan-dim); }
-  @media (max-width: 560px) { .unlock-pill { display: none; } }
-  .chev-svg { color: var(--text-3); transition: transform .18s ease; }
-  .phase.open .chev-svg { transform: rotate(90deg); }
-  .phase-body { display: none; padding: 4px 12px 12px; border-top: 1px solid var(--border); }
+  .phase-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 13px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--sans);
+  }
+  .phase-btn:hover .ph-name { color: #ffffff; }
+  .ph-l { display: flex; align-items: center; gap: 11px; min-width: 0; }
+  .ph-name { font-size: 13.5px; font-weight: 500; color: var(--text); transition: color .15s; }
+  .phase.is-queued .ph-name { color: var(--text-2); }
+  .ph-r { display: inline-flex; align-items: center; gap: 9px; flex-shrink: 0; font-size: 12px; color: var(--text-3); }
+  .phase.is-active .ph-r { color: var(--amber); }
+  .chev { color: var(--text-3); transition: transform .18s ease; }
+  .phase.open .chev { transform: rotate(90deg); }
+
+  .phase-body { display: none; padding: 0 0 12px 28px; }
   .phase.open .phase-body { display: block; }
 
-  .ms-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-  .ms { border-radius: 9px; padding: 9px 11px; background: rgba(255, 255, 255, 0.02); border: 1px solid transparent; }
-  .ms.st-active { background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.22); }
-  .ms-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .ms-row.clickable { cursor: pointer; }
-  .ms-l { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
-  .ms-ico { margin-top: 1px; flex-shrink: 0; }
-  .ms-id { font-size: 11.5px; font-weight: 600; color: var(--text-3); margin-top: 1px; flex-shrink: 0; }
+  .ms { padding: 6px 0; }
+  .ms-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+  .ms-line.clickable { cursor: pointer; }
+  .ms-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .ms-id { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
   .ms.st-done .ms-id { color: var(--green); }
   .ms.st-active .ms-id { color: var(--amber); }
-  .ms-title { font-size: 13px; color: var(--text); font-weight: 500; line-height: 1.35; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .ms.st-queued .ms-title { color: var(--text-2); }
-  .ms-note { font-size: 11.5px; color: var(--text-3); margin-top: 2px; line-height: 1.4; }
-  .ms-r { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
-  .ms-metric { font-size: 11px; color: var(--text-2); text-align: right; }
-  .ms.st-done .ms-metric { color: var(--green); }
-  .ms.st-active .ms-metric { color: var(--amber); }
-  .ms-time { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-3); }
-  .ms.st-active .ms-time { color: var(--amber); }
-  .sub-chev { color: var(--text-3); transition: transform .18s ease; }
-  .ms.sub-open .sub-chev { transform: rotate(90deg); }
+  .ms-t { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ms.st-active .ms-t { color: var(--text); font-weight: 500; }
+  .ms-r { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-3); flex-shrink: 0; }
+  .ms.st-active .ms-r { color: var(--amber); }
 
-  .subs { display: none; margin-top: 8px; padding-left: 14px; border-left: 1px solid var(--border-hi); flex-direction: column; gap: 6px; }
+  .subs {
+    display: none;
+    margin: 7px 0 2px 7px;
+    padding-left: 14px;
+    border-left: 1px solid var(--line-hi);
+    flex-direction: column;
+    gap: 6px;
+  }
   .ms.sub-open .subs { display: flex; }
-  .sub { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.26); border: 1px solid var(--border); }
-  .sub.st-active { border-color: rgba(245, 158, 11, 0.34); background: rgba(245, 158, 11, 0.08); }
-  .sub-l { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
-  .sub-id { font-size: 11px; font-weight: 700; color: var(--text-3); flex-shrink: 0; margin-top: 2px; }
+  .sub { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; padding: 3px 0; }
+  .sub-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .sub-id { font-size: 10.5px; color: var(--text-3); flex-shrink: 0; }
   .sub.st-done .sub-id { color: var(--green); }
-  .sub.st-active .sub-id { color: var(--amber); }
-  .sub-title { font-size: 12px; color: var(--text); line-height: 1.35; }
-  .sub.st-queued .sub-title { color: var(--text-2); }
-  .sub-note { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-  .sub-r { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font-size: 11px; color: var(--text-3); }
+  .sub.st-active .sub-id { color: var(--amber); font-weight: 600; }
+  .sub-t { color: var(--text-3); }
+  .sub.st-done .sub-t { color: var(--text-2); }
+  .sub.st-active .sub-t { color: var(--text); }
+  .sub-r { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); flex-shrink: 0; }
   .sub.st-active .sub-r { color: var(--amber); }
-  .sub.st-done .sub-r { color: var(--green); }
 
-  .bonus-strip { font-size: 11.5px; color: var(--text-3); padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
+  /* Subtle Single-Line Footer & Optional LB Drawer */
+  .foot {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11.5px;
+    color: var(--text-3);
+  }
+  .foot-btn {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+  }
+  .foot-btn:hover { color: var(--text-2); }
 
-  .drawer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .drawer-head { width: 100%; background: transparent; border: none; color: var(--text-2); padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-family: var(--sans); cursor: pointer; }
-  .drawer-head:hover { color: var(--text); }
-  .drawer.open .drawer-chev { transform: rotate(90deg); }
-  .drawer-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
-  .drawer.open .drawer-body { display: block; }
-  .drawer-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; margin-top: 14px; }
-  @media (max-width: 820px) { .drawer-grid { grid-template-columns: 1fr; } }
-  .sec-title { font-size: 11px; letter-spacing: 0.1em; color: var(--text-3); text-transform: uppercase; margin-bottom: 10px; }
+  .lb-panel { display: none; margin-top: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .lb-panel.open { display: block; }
   .lb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .lb-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .lb-table tr.is-us { background: rgba(56, 189, 248, 0.1); color: var(--cyan); font-weight: 600; }
-  .lb-table tr.gold-cut td { border-bottom: 1px dashed rgba(245, 158, 11, 0.45); }
-  .lb-rank { width: 36px; color: var(--text-3); }
+  .lb-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.035); color: var(--text-2); }
+  .lb-table tr.is-us td { color: var(--cyan); font-weight: 600; }
+  .lb-table tr.gold-cut td { border-bottom: 1px dashed rgba(245,158,11,0.4); }
   .lb-score { text-align: right; }
-
-  .event-list { display: flex; flex-direction: column; gap: 8px; }
-  .ev { display: flex; gap: 10px; font-size: 12px; line-height: 1.45; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.02); }
-  .ev-time { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
-  .ev-win { border-left: 2px solid var(--green); }
-  .ev-alert { border-left: 2px solid var(--amber); }
-  .ev-info { border-left: 2px solid var(--cyan); }
-
-  .footer-note { margin-top: 14px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--text-3); }
 </style>
 </head>
 <body>
 
 <div id="gate" class="gate">
   <div class="gate-card">
-    <div class="gate-kicker mono">MILESTONE WAR-ROOM</div>
-    <div class="gate-title">私域战情墙</div>
-    <div class="gate-sub">请输入访问密钥以解锁实时遥测数据</div>
+    <div class="gate-title mono">WAR-ROOM</div>
     <form id="auth-form">
       <input id="auth-key" class="gate-input" type="password" placeholder="Access Key" autocomplete="current-password" required />
-      <button class="gate-btn" type="submit">进入战情室</button>
+      <button class="gate-btn" type="submit">解锁</button>
     </form>
     <div id="gate-err" class="gate-err"></div>
   </div>
 </div>
 
 <div id="app" class="wrap">
-  <header class="topbar">
-    <div class="brand">
-      <span class="live-pill mono">
-        <svg class="svg-ico" width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
-          <circle cx="9" cy="9" r="3" fill="currentColor"/>
-          <circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.4">
-            <animate attributeName="r" from="3" to="8.2" dur="1.8s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" from="0.85" to="0" dur="1.8s" repeatCount="indefinite"/>
+  <header class="header">
+    <div class="score-flow mono">
+      <span class="score-now">
+        <svg class="svg-ico" width="10" height="10" viewBox="0 0 12 12" aria-hidden="true">
+          <circle cx="6" cy="6" r="2.6" fill="#34d399"/>
+          <circle cx="6" cy="6" r="2.6" fill="none" stroke="#34d399" stroke-width="1">
+            <animate attributeName="r" from="2.6" to="5.6" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from="0.8" to="0" dur="2.2s" repeatCount="indefinite"/>
           </circle>
         </svg>
-        LIVE
+        <span id="our-rank">—</span>
+        <strong id="our-score">—</strong>
       </span>
-      <div>
-        <div class="brand-title mono" id="mission-title">MILESTONE WAR-ROOM</div>
-        <div class="brand-sub" id="mission-sub">Live Telemetry Dashboard</div>
-      </div>
+      <span class="score-arrow">→</span>
+      <span class="score-proj">
+        <strong id="proj-single">—</strong>
+        <span class="score-combo" id="proj-combo"></span>
+      </span>
     </div>
+
     <div class="controls">
-      <div class="seg" role="tablist" aria-label="视图颗粒度">
-        <button data-mode="macro">大阶段</button>
-        <button data-mode="focus" class="active">聚焦攻坚</button>
-        <button data-mode="all">全螺丝钉</button>
+      <div class="seg" role="tablist">
+        <button data-mode="macro">总览</button>
+        <button data-mode="focus" class="active">聚焦</button>
+        <button data-mode="all">明细</button>
       </div>
-      <button class="icon-btn mono" id="refresh-btn" title="点击立即刷新 · 每 30 秒自动同步">
-        <svg class="svg-ico" width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+      <button class="sync-btn mono" id="refresh-btn" title="每 30 秒自动刷新">
+        <svg class="svg-ico" width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
           <circle cx="9" cy="9" r="6.5" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.6"/>
           <circle id="ring-arc" cx="9" cy="9" r="6.5" fill="none" stroke="#38bdf8" stroke-width="1.6"
                   stroke-linecap="round" stroke-dasharray="40.84" stroke-dashoffset="0"
@@ -289,337 +280,67 @@
     </div>
   </header>
 
-  <section class="telemetry-grid">
-    <div class="stat">
-      <div class="stat-label"><span>当前基准成绩</span><span class="mono" id="pb-ver">--</span></div>
-      <div class="stat-val mono" id="our-score">--</div>
-      <div class="stat-sub" id="our-rank-line">--</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label"><span>实时标杆</span><span class="mono inline-chip" id="radar-ts">--:--</span></div>
-      <div class="stat-val mono" id="rank1-score">--</div>
-      <div class="stat-sub" id="rank3-line">--</div>
-    </div>
-    <div class="stat highlight">
-      <div class="stat-label"><span>单引擎落地预计得分</span><span class="mono tag-green" id="single-badge">目标 #1</span></div>
-      <div class="stat-val mono" id="single-score">--</div>
-      <div class="stat-sub" id="single-delta">--</div>
-    </div>
-    <div class="stat highlight">
-      <div class="stat-label"><span id="combo-label">双引擎合龙预期</span><span class="mono tag-cyan" id="combo-delta">--</span></div>
-      <div class="stat-val mono" id="combo-score">--</div>
-      <div class="stat-sub mono" id="quota-line"></div>
-    </div>
-  </section>
+  <main class="grid" id="engines"></main>
 
-  <main class="engines" id="engines"></main>
-
-  <section class="drawer" id="drawer">
-    <button class="drawer-head" id="drawer-toggle">
-      <span><strong style="color:var(--text);font-weight:500;">实时排行榜 &amp; 战报流</strong> · <span id="drawer-summary" class="mono">展开查看</span></span>
-      <svg class="svg-ico chev-svg drawer-chev" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+  <footer class="foot mono">
+    <button class="foot-btn" id="lb-toggle">
+      <span id="foot-metrics">排行榜</span>
+      <svg class="svg-ico chev" id="lb-chev" width="12" height="12" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <div class="drawer-body">
-      <div class="drawer-grid">
-        <div>
-          <div class="sec-title">Leaderboard</div>
-          <table class="lb-table mono" id="lb-table"></table>
-        </div>
-        <div>
-          <div class="sec-title">Live Broadcast Feed</div>
-          <div class="event-list" id="event-list"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer-note mono">
-    <span id="policy-line">TELEMETRY DASHBOARD</span>
-    <span id="sync-line"></span>
+    <span id="foot-right" style="display:inline-flex;align-items:center;gap:10px;"></span>
   </footer>
+
+  <section class="lb-panel" id="lb-panel">
+    <table class="lb-table mono" id="lb-table"></table>
+  </section>
 </div>
 
 <script>
 const SVG = {
-  checkRing(size = 18) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" role="img" aria-label="Done"><title>已完成</title>
-      <circle cx="9" cy="9" r="7.5" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.35"/>
-      <path class="check-path" d="M5.6 9.2L7.9 11.5L12.6 6.6" fill="none" stroke="#34d399" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  check(size = 16) {
+    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" aria-label="Done"><title>已完成</title>
+      <circle cx="9" cy="9" r="7.4" fill="rgba(52,211,153,0.11)" stroke="#34d399" stroke-width="1.3"/>
+      <path d="M5.6 9.2L7.9 11.4L12.5 6.7" fill="none" stroke="#34d399" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
   },
-  checkBare(size = 15) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" role="img" aria-label="Done"><title>已完成</title>
-      <path class="check-path" d="M3.2 8.4L6.5 11.6L13 4.8" fill="none" stroke="#34d399" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  tick(size = 14) {
+    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-label="Done"><title>已完成</title>
+      <path d="M3.2 8.4L6.4 11.5L12.8 4.8" fill="none" stroke="#34d399" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
   },
-  activeOrbit(size = 18) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" role="img" aria-label="Active"><title>攻坚中</title>
-      <circle class="spin-orbit" cx="9" cy="9" r="7.2" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="14 6 5 6" stroke-linecap="round"/>
-      <circle class="pulse-core" cx="9" cy="9" r="2.6" fill="#f59e0b"/>
+  orbit(size = 16) {
+    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" aria-label="Active"><title>攻坚中</title>
+      <circle class="spin" cx="9" cy="9" r="7.1" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="14 6 5 6" stroke-linecap="round"/>
+      <circle class="pulse" cx="9" cy="9" r="2.5" fill="#f59e0b"/>
     </svg>`;
   },
-  queuedRing(size = 16) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" role="img" aria-label="Queued"><title>待命</title>
-      <circle cx="8" cy="8" r="5.6" fill="none" stroke="#475569" stroke-width="1.3" stroke-dasharray="2.4 2.4"/>
+  idle(size = 15) {
+    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-label="Queued"><title>待命</title>
+      <circle cx="8" cy="8" r="5.3" fill="none" stroke="#3b475c" stroke-width="1.25"/>
     </svg>`;
   },
-  clock(size = 13, animated = false, title = '耗时') {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true"><title>${title}</title>
-      <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.35" opacity="0.85"/>
-      <line x1="8" y1="8" x2="8" y2="4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" class="${animated ? 'clock-hand' : ''}"/>
-      <line x1="8" y1="8" x2="10.7" y2="9.3" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-    </svg>`;
-  },
-  pulseWave(size = 13) {
+  clock(size = 12, anim = false) {
     return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M1.5 8.5H4.2L6 4.2L8.3 12L10.3 6.8L11.7 8.5H14.5" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.85"/>
+      <line x1="8" y1="8" x2="8" y2="4.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" class="${anim ? 'clock-hand' : ''}"/>
+      <line x1="8" y1="8" x2="10.6" y2="9.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
     </svg>`;
   },
-  chevron(cls = '', size = 14) {
-    return `<svg class="svg-ico ${cls}" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
-  },
-  arrowUpRight(size = 12) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M4.5 11.5L11.5 4.5M6.2 4.5H11.5V9.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
-  },
-  spark(size = 13) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M8 1.8L9.6 6.4L14.2 8L9.6 9.6L8 14.2L6.4 9.6L1.8 8L6.4 6.4Z" fill="none" stroke="#38bdf8" stroke-width="1.3" stroke-linejoin="round"/>
+  chev(size = 13) {
+    return `<svg class="svg-ico chev" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
   },
 };
 
+const state = { mode: 'focus', phaseOpen: {}, subOpen: {}, data: null, tick: 30 };
+
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
-
-function statusMap(eng) {
-  const m = {};
-  for (const ph of eng.phases || []) {
-    for (const ms of ph.milestones || []) {
-      m[ms.id] = ms.status;
-      for (const s of ms.substeps || []) m[s.id] = s.status;
-    }
-  }
-  return m;
-}
-
-function renderPipelineTopology(eng, topo) {
-  const st = statusMap(eng);
-  const uid = esc(eng.id || 'pipe');
-  const blocks = (topo.blocks || []).slice(0, 3);
-  const coords = [
-    { x: 34, y: 20, w: 134, h: 68 },
-    { x: 190, y: 16, w: 140, h: 76 },
-    { x: 352, y: 20, w: 134, h: 68 },
-  ];
-
-  function resolveState(b) {
-    const s = st[b.status_id];
-    if (s === 'done') return 'done';
-    if (s === 'active' || (b.active_fallback_id && st[b.active_fallback_id] === 'active')) return 'active';
-    return 'queued';
-  }
-
-  function styleOf(s) {
-    if (s === 'done') return { fill: 'rgba(52,211,153,0.13)', stroke: '#34d399', text: '#6ee7b7', cls: '', dash: '' };
-    if (s === 'active') return { fill: `url(#${uid}Grad)`, stroke: `url(#${uid}Stroke)`, text: '#fde68a', cls: 'block-breathe', dash: '' };
-    return { fill: 'rgba(255,255,255,0.025)', stroke: 'rgba(148,163,184,0.32)', text: '#94a3b8', cls: '', dash: '3 3' };
-  }
-
-  const nodesHtml = blocks.map((b, i) => {
-    const c = coords[i];
-    const s = resolveState(b);
-    const sty = styleOf(s);
-    const cx = c.x + c.w / 2;
-    const label = s === 'done' ? (b.done_label || '✓ DONE') : s === 'active' ? (b.active_label || '⚡ ACTIVE') : (b.queued_label || '◎ QUEUED');
-    const lblColor = s === 'done' ? '#34d399' : s === 'active' ? '#f59e0b' : '#94a3b8';
-    return `
-      <g class="circuit-node" data-jump-phase="${esc(b.jump_phase || '')}">
-        <rect x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="9" fill="${sty.fill}" stroke="${sty.stroke}" stroke-width="1.45" stroke-dasharray="${sty.dash}" class="${sty.cls}" ${s === 'active' ? `filter="url(#${uid}Glow)"` : ''}/>
-        <text x="${cx}" y="${c.y + 23}" text-anchor="middle" fill="${sty.text}" font-size="10.5" font-weight="600" font-family="ui-monospace,monospace">${esc(b.title)}</text>
-        <text x="${cx}" y="${c.y + 39}" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="ui-monospace,monospace">${esc(b.sub || '')}</text>
-        <text x="${cx}" y="${c.y + 56}" text-anchor="middle" fill="${lblColor}" font-size="8.5" font-family="ui-monospace,monospace">${esc(label)}</text>
-      </g>`;
-  }).join('');
-
-  return `
-  <div class="circuit-box">
-    <div class="circuit-head mono">
-      <span>${esc(topo.header || 'EXECUTION PIPELINE TOPOLOGY')}</span>
-      <span class="circuit-legend">
-        <span class="lg-item"><span class="lg-dot" style="background:#34d399"></span>已过验</span>
-        <span class="lg-item"><span class="lg-dot" style="background:#f59e0b"></span>攻坚中</span>
-      </span>
-    </div>
-    <svg class="circuit-svg" viewBox="0 0 520 112" aria-label="Pipeline Topology">
-      <defs>
-        <linearGradient id="${uid}Grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.34">
-            <animate attributeName="stop-color" values="#f59e0b;#38bdf8;#f59e0b" dur="3.4s" repeatCount="indefinite"/>
-          </stop>
-          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.22">
-            <animate attributeName="stop-color" values="#38bdf8;#f59e0b;#38bdf8" dur="3.4s" repeatCount="indefinite"/>
-          </stop>
-        </linearGradient>
-        <linearGradient id="${uid}Stroke" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#f59e0b">
-            <animate attributeName="stop-color" values="#f59e0b;#38bdf8;#f59e0b" dur="3.4s" repeatCount="indefinite"/>
-          </stop>
-          <stop offset="100%" stop-color="#38bdf8">
-            <animate attributeName="stop-color" values="#38bdf8;#f59e0b;#38bdf8" dur="3.4s" repeatCount="indefinite"/>
-          </stop>
-        </linearGradient>
-        <filter id="${uid}Glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3.2" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <g stroke="rgba(148,163,184,0.18)" stroke-width="1">
-        <line x1="14" y1="30" x2="506" y2="30"/>
-        <line x1="14" y1="54" x2="506" y2="54"/>
-        <line x1="14" y1="78" x2="506" y2="78"/>
-      </g>
-      <g stroke="#38bdf8" stroke-width="1.3" opacity="0.6" class="wire-flow">
-        <line x1="14" y1="30" x2="506" y2="30"/>
-        <line x1="14" y1="54" x2="506" y2="54"/>
-        <line x1="14" y1="78" x2="506" y2="78"/>
-      </g>
-      <text x="14" y="23" fill="#64748b" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.rail_top || '')}</text>
-      <text x="14" y="98" fill="#64748b" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.rail_bottom || '')}</text>
-      ${nodesHtml}
-      <circle cx="179" cy="54" r="3" fill="#38bdf8"/>
-      <circle cx="341" cy="54" r="3" fill="#f59e0b"/>
-      <text x="506" y="98" text-anchor="end" fill="#38bdf8" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.right_caption || '')}</text>
-    </svg>
-  </div>`;
-}
-
-function renderCeilingTopology(eng, topo) {
-  const st = statusMap(eng);
-  const uid = esc(eng.id || 'ceil');
-  const bn = topo.bottleneck || {};
-  const out = topo.output || {};
-  const bnDone = st[bn.status_id] === 'done' || st[bn.parent_id] === 'done';
-  const bnActive = !bnDone && (st[bn.status_id] === 'active' || st[bn.parent_id] === 'active');
-  const outDone = st[out.status_id] === 'done';
-  const outActive = !outDone && (out.active_ids || []).some(id => st[id] === 'active');
-
-  const sqY = bnDone ? 28 : 13;
-  const sqH = bnDone ? 56 : 71;
-  const stages = (topo.stages || []).slice(0, 2);
-  const stageXs = [24, 136];
-
-  const stagesHtml = stages.map((sg, i) => {
-    const done = st[sg.status_id] === 'done';
-    const x = stageXs[i];
-    return `
-      <g class="circuit-node" data-jump-phase="${esc(sg.jump_phase || '')}">
-        <rect x="${x}" y="30" width="96" height="54" rx="8" fill="${done ? 'rgba(52,211,153,0.13)' : 'rgba(255,255,255,0.03)'}" stroke="${done ? '#34d399' : '#64748b'}" stroke-width="1.35"/>
-        <text x="${x + 48}" y="51" text-anchor="middle" fill="${done ? '#6ee7b7' : '#cbd5e1'}" font-size="10" font-weight="600" font-family="ui-monospace,monospace">${esc(sg.title)}</text>
-        <text x="${x + 48}" y="67" text-anchor="middle" fill="${done ? '#34d399' : '#94a3b8'}" font-size="8.5" font-family="ui-monospace,monospace">${esc(sg.done_label || '')}</text>
-      </g>`;
-  }).join('');
-
-  return `
-  <div class="circuit-box">
-    <div class="circuit-head mono">
-      <span>${esc(topo.header || 'RESOURCE CEILING TOPOLOGY')}</span>
-      <span class="circuit-legend">
-        <span class="lg-item"><span class="lg-dot" style="background:#34d399"></span>已过验</span>
-        <span class="lg-item"><span class="lg-dot" style="background:#f59e0b"></span>压宽攻坚</span>
-      </span>
-    </div>
-    <svg class="circuit-svg" viewBox="0 0 520 112" aria-label="Ceiling Topology">
-      <defs>
-        <linearGradient id="${uid}Grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.36">
-            <animate attributeName="stop-color" values="#f59e0b;#818cf8;#f59e0b" dur="3.2s" repeatCount="indefinite"/>
-          </stop>
-          <stop offset="100%" stop-color="#818cf8" stop-opacity="0.24">
-            <animate attributeName="stop-color" values="#818cf8;#f59e0b;#818cf8" dur="3.2s" repeatCount="indefinite"/>
-          </stop>
-        </linearGradient>
-        <linearGradient id="${uid}Stroke" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#f59e0b">
-            <animate attributeName="stop-color" values="#f59e0b;#a78bfa;#f59e0b" dur="3.2s" repeatCount="indefinite"/>
-          </stop>
-          <stop offset="100%" stop-color="#818cf8">
-            <animate attributeName="stop-color" values="#818cf8;#f59e0b;#818cf8" dur="3.2s" repeatCount="indefinite"/>
-          </stop>
-        </linearGradient>
-        <filter id="${uid}Glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3.2" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <line x1="14" y1="25" x2="506" y2="25" stroke="rgba(56,189,248,0.45)" stroke-width="1" stroke-dasharray="5 4"/>
-      <text x="14" y="21" fill="#38bdf8" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.ceiling_label || 'TARGET CEILING')}</text>
-      <g stroke="rgba(148,163,184,0.18)" stroke-width="1">
-        <line x1="14" y1="44" x2="506" y2="44"/>
-        <line x1="14" y1="68" x2="506" y2="68"/>
-      </g>
-      <g stroke="#818cf8" stroke-width="1.3" opacity="0.6" class="wire-flow">
-        <line x1="14" y1="44" x2="506" y2="44"/>
-        <line x1="14" y1="68" x2="506" y2="68"/>
-      </g>
-      ${stagesHtml}
-      <g class="circuit-node" data-jump-phase="${esc(bn.jump_phase || '')}">
-        <rect x="248" y="${sqY}" width="134" height="${sqH}" rx="9"
-              fill="${bnDone ? 'rgba(52,211,153,0.13)' : `url(#${uid}Grad)`}"
-              stroke="${bnDone ? '#34d399' : `url(#${uid}Stroke)`}"
-              stroke-width="1.5" class="${bnActive ? 'block-breathe' : ''}"
-              ${bnActive ? `filter="url(#${uid}Glow)"` : ''}/>
-        ${!bnDone ? `
-          <g class="squeeze-anim">
-            <path d="M311 4 L315 9 L319 4" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-          <text x="315" y="36" text-anchor="middle" fill="#fde68a" font-size="9" font-weight="700" font-family="ui-monospace,monospace">${esc(bn.over_label || '')}</text>
-        ` : ''}
-        <text x="315" y="${bnDone ? 51 : 54}" text-anchor="middle" fill="${bnDone ? '#6ee7b7' : '#ffffff'}" font-size="10.2" font-weight="600" font-family="ui-monospace,monospace">${esc(bn.title || '')}</text>
-        <text x="315" y="${bnDone ? 68 : 72}" text-anchor="middle" fill="${bnDone ? '#34d399' : '#fbbf24'}" font-size="8.5" font-family="ui-monospace,monospace">${esc(bnDone ? (bn.done_label || '✓ DONE') : (bn.active_label || '⚡ ACTIVE'))}</text>
-      </g>
-      <g class="circuit-node" data-jump-phase="${esc(out.jump_phase || '')}">
-        <rect x="398" y="30" width="102" height="54" rx="8"
-              fill="${outDone ? 'rgba(52,211,153,0.13)' : outActive ? `url(#${uid}Grad)` : 'rgba(255,255,255,0.025)'}"
-              stroke="${outDone ? '#34d399' : outActive ? '#f59e0b' : 'rgba(148,163,184,0.28)'}"
-              stroke-width="1.35" stroke-dasharray="${outDone || outActive ? '' : '3 3'}"/>
-        <text x="449" y="51" text-anchor="middle" fill="${outDone ? '#6ee7b7' : '#cbd5e1'}" font-size="10" font-weight="600" font-family="ui-monospace,monospace">${esc(out.title || 'OUTPUT')}</text>
-        <text x="449" y="67" text-anchor="middle" fill="${outDone ? '#34d399' : '#94a3b8'}" font-size="8.5" font-family="ui-monospace,monospace">${esc(outDone ? (out.done_label || '✓ DONE') : (out.queued_label || 'READY'))}</text>
-      </g>
-      <text x="14" y="99" fill="#64748b" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.bottom_left || '')}</text>
-      <text x="506" y="99" text-anchor="end" fill="#818cf8" font-size="8.5" font-family="ui-monospace,monospace">${esc(topo.right_caption || '')}</text>
-    </svg>
-  </div>`;
-}
-
-function renderEngineTopology(eng) {
-  const topo = eng.topology;
-  if (!topo) return '';
-  if (topo.type === 'pipeline') return renderPipelineTopology(eng, topo);
-  if (topo.type === 'ceiling') return renderCeilingTopology(eng, topo);
-  return '';
-}
-
-const state = { mode: 'focus', phaseOpen: {}, subOpen: {}, data: null, tick: 30 };
-
 function apiUrl(p) {
-  const base = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '');
-  return base + p;
+  return window.location.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '') + p;
 }
-
-function fmtTime(iso) {
-  if (!iso) return '--:--';
-  const d = new Date(iso);
-  if (isNaN(d)) return '--:--';
-  return d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-}
-
 function fmtElapsed(iso) {
   if (!iso) return '';
   const diff = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
@@ -628,25 +349,110 @@ function fmtElapsed(iso) {
   if (m < 60) return m + 'm';
   return Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0') + 'm';
 }
-
-function fmtHeartbeat(age) {
-  if (age == null) return { text: 'LIVE', fresh: true };
-  if (age < 90) return { text: age + 's', fresh: true };
-  if (age < 900) return { text: Math.floor(age / 60) + 'm', fresh: true };
-  return { text: Math.floor(age / 60) + 'm', fresh: false };
+function fmtTime(iso) {
+  if (!iso) return '--:--';
+  const d = new Date(iso);
+  return isNaN(d) ? '--:--' : d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
 }
-
 function fmtReset(sec) {
   if (sec == null) return '--:--';
   return String(Math.floor(sec / 3600)).padStart(2, '0') + ':' + String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
 }
-
 function phaseStatus(ph) {
   const ms = ph.milestones || [];
   if (ms.length && ms.every(m => m.status === 'done')) return 'done';
-  if (ms.some(m => m.status === 'active' || (m.substeps || []).some(s => s.status === 'active'))) return 'active';
-  if (ms.some(m => m.status === 'done')) return 'active';
+  if (ms.some(m => m.status === 'active' || m.status === 'done' || (m.substeps || []).some(s => s.status === 'active'))) return 'active';
   return 'queued';
+}
+function activeNodeId(ph) {
+  for (const ms of ph.milestones || []) {
+    for (const s of ms.substeps || []) if (s.status === 'active') return s.id;
+    if (ms.status === 'active') return ms.id;
+  }
+  return '';
+}
+function phaseActiveTime(ph) {
+  for (const ms of ph.milestones || []) {
+    for (const s of ms.substeps || []) if (s.status === 'active' && s.started_utc) return fmtElapsed(s.started_utc);
+    if (ms.status === 'active' && ms.started_utc) return fmtElapsed(ms.started_utc);
+  }
+  return '';
+}
+function shortLabel(text, maxLen = 8) {
+  const clean = String(text || '').replace(/[（(].*?[)）]/g, '').split(/[&·]/)[0].trim();
+  return clean.length > maxLen ? clean.slice(0, maxLen) : clean;
+}
+
+/**
+ * 100% Data-Driven Auto-Layout SVG Circuit Flow:
+ * Adapts automatically to ANY number of phases (2..N), ANY milestone changes,
+ * and optional ceiling_label — ZERO UI redraw ever required.
+ */
+function renderDynamicCircuit(eng, idx) {
+  const phases = eng.phases || [];
+  if (!phases.length) return '';
+  const n = phases.length;
+  const W = 460, H = 74, padX = 10, gap = 14;
+  const boxW = Math.floor((W - padX * 2 - gap * (n - 1)) / n);
+  const accent = eng.accent === 'indigo' ? '#818cf8' : '#38bdf8';
+  const uid = 'g' + idx + '_' + esc(eng.id || 'e').replace(/[^a-zA-Z0-9]/g, '');
+  const ceiling = eng.ceiling_label || (eng.topology && eng.topology.ceiling_label) || '';
+
+  const nodesHtml = phases.map((ph, i) => {
+    const st = phaseStatus(ph);
+    const x = padX + i * (boxW + gap);
+    const cx = x + boxW / 2;
+    const isOver = Boolean(ceiling) && st === 'active';
+    const y = isOver ? 10 : 20;
+    const h = isOver ? 52 : 42;
+    const label = esc(ph.short_title || shortLabel(ph.title, n >= 4 ? 6 : 8));
+    const actId = activeNodeId(ph);
+    const msDone = (ph.milestones || []).filter(m => m.status === 'done').length;
+    const msTot = (ph.milestones || []).length;
+    const subTxt = st === 'done' ? '✓' : st === 'active' ? (actId || `${msDone}/${msTot}`) : `${msDone}/${msTot}`;
+
+    const fill = st === 'done' ? 'rgba(52,211,153,0.1)' : st === 'active' ? `url(#${uid}F)` : 'rgba(255,255,255,0.02)';
+    const stroke = st === 'done' ? '#34d399' : st === 'active' ? `url(#${uid}S)` : 'rgba(255,255,255,0.12)';
+    const dash = st === 'queued' ? '3 3' : '';
+    const titleColor = st === 'done' ? '#a7f3d0' : st === 'active' ? '#ffffff' : '#7b8ba3';
+    const subColor = st === 'done' ? '#34d399' : st === 'active' ? '#fbbf24' : '#526077';
+
+    return `
+      <g class="c-node" data-jump="${esc(ph.id)}">
+        <rect x="${x}" y="${y}" width="${boxW}" height="${h}" rx="10"
+              fill="${fill}" stroke="${stroke}" stroke-width="${st === 'active' ? 1.35 : 1.15}" stroke-dasharray="${dash}"/>
+        ${isOver ? `<path class="drop-hint" d="M${cx - 4} 2 L${cx} 6.5 L${cx + 4} 2" fill="none" stroke="#f59e0b" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+        <text x="${cx}" y="${y + (isOver ? 24 : 18)}" text-anchor="middle" fill="${titleColor}" font-size="10.5" font-weight="${st === 'active' ? 600 : 500}" font-family="ui-monospace,monospace">${label}</text>
+        <text x="${cx}" y="${y + (isOver ? 40 : 33)}" text-anchor="middle" fill="${subColor}" font-size="9" font-family="ui-monospace,monospace">${esc(subTxt)}</text>
+      </g>`;
+  }).join('');
+
+  return `
+  <svg class="circuit" viewBox="0 0 ${W} ${H}" aria-label="${esc(eng.name)} 进展拓扑">
+    <defs>
+      <linearGradient id="${uid}F" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28">
+          <animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="4s" repeatCount="indefinite"/>
+        </stop>
+        <stop offset="100%" stop-color="${accent}" stop-opacity="0.14">
+          <animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="4s" repeatCount="indefinite"/>
+        </stop>
+      </linearGradient>
+      <linearGradient id="${uid}S" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#f59e0b">
+          <animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="4s" repeatCount="indefinite"/>
+        </stop>
+        <stop offset="100%" stop-color="${accent}">
+          <animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="4s" repeatCount="indefinite"/>
+        </stop>
+      </linearGradient>
+    </defs>
+    ${ceiling ? `<line x1="6" y1="18" x2="${W - 6}" y2="18" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="8" y="13" fill="#38bdf8" font-size="8.5" font-family="ui-monospace,monospace" opacity="0.75">${esc(ceiling)}</text>` : ''}
+    <line x1="6" y1="41" x2="${W - 6}" y2="41" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+    <line x1="6" y1="41" x2="${W - 6}" y2="41" stroke="${accent}" stroke-width="1.2" opacity="0.55" class="wire-flow"/>
+    ${nodesHtml}
+  </svg>`;
 }
 
 function isPhaseOpen(ph, st) {
@@ -655,7 +461,6 @@ function isPhaseOpen(ph, st) {
   if (state.mode === 'macro') return false;
   return st === 'active';
 }
-
 function isSubOpen(ms) {
   if (ms.id in state.subOpen) return state.subOpen[ms.id];
   if (state.mode === 'all') return true;
@@ -663,125 +468,65 @@ function isSubOpen(ms) {
   return ms.status === 'active';
 }
 
-function findActiveStep(eng) {
-  for (const ph of eng.phases || []) {
-    for (const ms of ph.milestones || []) {
-      for (const sub of ms.substeps || []) {
-        if (sub.status === 'active') return sub;
-      }
-      if (ms.status === 'active') return ms;
-    }
-  }
-  return null;
-}
-
 function render(d) {
   state.data = d;
-  document.getElementById('mission-title').textContent = d.mission_title || 'MILESTONE WAR-ROOM';
-  document.getElementById('mission-sub').textContent = d.mission_subtitle || 'Live Telemetry';
-  document.getElementById('policy-line').textContent = d.policy_badge || 'PRIVATE TELEMETRY';
-
+  document.title = (d.mission_title || 'WAR-ROOM') + ' // 进展看板';
   const r = d.radar || {};
   const f = d.fleet || {};
-  const ourScore = r.our_score ?? f.private_pb_score ?? 0;
-  document.getElementById('pb-ver').textContent = f.private_pb_version || 'PB';
-  document.getElementById('our-score').textContent = Number(ourScore).toFixed(2);
-  document.getElementById('our-rank-line').textContent = r.our_rank ? `#${r.our_rank}` : '当前私域基准';
+  const ourScore = r.our_score ?? f.private_pb_score;
+  const digits = ourScore && ourScore < 50 ? 5 : 2;
+  document.getElementById('our-rank').textContent = r.our_rank ? '#' + r.our_rank : (f.private_pb_version || 'PB');
+  document.getElementById('our-score').textContent = ourScore != null ? Number(ourScore).toFixed(digits) : '—';
 
-  document.getElementById('rank1-score').textContent = r.rank1 ? Number(r.rank1.score).toFixed(2) : '—';
-  document.getElementById('radar-ts').innerHTML = `${SVG.clock(12, false)} ${esc(fmtTime(r.checked_utc || d.updated_utc))}`;
-  document.getElementById('rank3-line').textContent = r.rank3 ? `Top 3: ${Number(r.rank3.score).toFixed(2)}` : '未接入外部榜单 (演示模式)';
-
-  const sp = d.single_projection || {};
-  document.getElementById('single-score').textContent = sp.score || '—';
-  document.getElementById('single-delta').textContent = sp.delta_text || '';
-  document.getElementById('single-badge').textContent = sp.badge || 'TARGET';
-
-  const cp = d.combo_projection || {};
-  document.getElementById('combo-label').textContent = cp.label || '双引擎合龙预期';
-  document.getElementById('combo-score').textContent = cp.score || '—';
-  document.getElementById('combo-delta').textContent = cp.delta_vs_pb || '';
-
-  const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
-  document.getElementById('quota-line').innerHTML =
-    `<span>${Number(f.cu_balance || 0).toFixed(0)} CU · 额度 ${remQ}/${f.quota_total || 5}</span>` +
-    `<span class="inline-chip">${SVG.clock(12, true)} ${fmtReset(d.reset_in_sec)}</span>`;
+  const sp = (d.single_projection && d.single_projection.score)
+    || (d.engines || []).map(e => e.projected_score).filter(Boolean).join(' / ')
+    || '—';
+  document.getElementById('proj-single').textContent = sp;
+  const combo = d.combo_projection && d.combo_projection.score;
+  document.getElementById('proj-combo').textContent = combo ? '合龙 ' + combo : '';
 
   const container = document.getElementById('engines');
-  container.innerHTML = (d.engines || []).map(eng => {
-    const allMs = (eng.phases || []).flatMap(p => p.milestones || []);
-    const doneCount = allMs.filter(m => m.status === 'done').length;
-    const pct = allMs.length ? Math.round((doneCount / allMs.length) * 100) : 0;
-    const hb = fmtHeartbeat(eng.heartbeat_age_sec);
-    const active = findActiveStep(eng);
-    const railHtml = allMs.map(m => `<div class="rail-seg ${m.status === 'done' ? 'done' : m.status === 'active' ? 'active' : ''}"></div>`).join('');
-
-    const focusHtml = active ? `
-      <div class="focus-banner">
-        <div class="focus-left">
-          ${SVG.activeOrbit(16)}
-          <span class="focus-id mono">${esc(active.id)}</span>
-          <span class="focus-text">${esc(active.title)}</span>
-        </div>
-        <span class="focus-time mono">${SVG.clock(13, true)} ${active.started_utc ? fmtElapsed(active.started_utc) : '--'}</span>
-      </div>` : '';
-
+  container.innerHTML = (d.engines || []).map((eng, idx) => {
     const phasesHtml = (eng.phases || []).map(ph => {
       const pst = phaseStatus(ph);
       const open = isPhaseOpen(ph, pst);
       const phDone = (ph.milestones || []).filter(m => m.status === 'done').length;
       const phTot = (ph.milestones || []).length;
-      const ico = pst === 'done' ? SVG.checkRing(18) : pst === 'active' ? SVG.activeOrbit(18) : SVG.queuedRing(18);
+      const actTime = pst === 'active' ? phaseActiveTime(ph) : '';
+      const ico = pst === 'done' ? SVG.check(17) : pst === 'active' ? SVG.orbit(17) : SVG.idle(16);
 
       const msHtml = (ph.milestones || []).map(ms => {
         const hasSubs = (ms.substeps || []).length > 0;
         const sOpen = hasSubs && isSubOpen(ms);
-        const subDone = hasSubs ? ms.substeps.filter(s => s.status === 'done').length : 0;
-        const msIco = ms.status === 'done' ? SVG.checkBare(14) : ms.status === 'active' ? SVG.activeOrbit(15) : SVG.queuedRing(14);
+        const msIco = ms.status === 'done' ? SVG.tick(13) : ms.status === 'active' ? SVG.orbit(14) : SVG.idle(13);
+        const msRight = ms.status === 'active' && ms.started_utc
+          ? `${SVG.clock(11, true)}<span>${fmtElapsed(ms.started_utc)}</span>`
+          : ms.status === 'done' && ms.completed_utc
+            ? `<span>${fmtTime(ms.completed_utc)}</span>`
+            : '';
+
         const subsHtml = hasSubs ? `
           <div class="subs">
             ${ms.substeps.map(s => {
-              let rightHtml = s.status === 'done'
-                ? `${s.completed_utc ? `<span>${fmtTime(s.completed_utc)}</span>` : ''}${SVG.checkRing(16)}`
-                : s.status === 'active'
-                  ? `${SVG.clock(13, true)}<span>${s.started_utc ? fmtElapsed(s.started_utc) : '--'}</span>${SVG.activeOrbit(16)}`
-                  : SVG.queuedRing(15);
+              const sIco = s.status === 'done' ? SVG.tick(12) : s.status === 'active' ? SVG.orbit(13) : SVG.idle(12);
+              const sRight = s.status === 'active' && s.started_utc
+                ? `${SVG.clock(11, true)}<span>${fmtElapsed(s.started_utc)}</span>`
+                : s.status === 'done' && s.completed_utc
+                  ? `<span>${fmtTime(s.completed_utc)}</span>`
+                  : '';
               return `
                 <div class="sub st-${esc(s.status)}">
-                  <div class="sub-l">
-                    <span class="sub-id mono">${esc(s.id)}</span>
-                    <div>
-                      <div class="sub-title">${esc(s.title)}</div>
-                      ${s.note ? `<div class="sub-note">${esc(s.note)}</div>` : ''}
-                    </div>
-                  </div>
-                  <div class="sub-r mono">${rightHtml}</div>
+                  <div class="sub-l">${sIco}<span class="sub-id mono">${esc(s.id)}</span><span class="sub-t">${esc(s.title)}</span></div>
+                  <div class="sub-r mono">${sRight}</div>
                 </div>`;
             }).join('')}
           </div>` : '';
 
-        let timeHtml = '';
-        if (ms.status === 'done' && ms.completed_utc) timeHtml = `<span class="ms-time mono">${SVG.clock(11, false)} ${fmtTime(ms.completed_utc)}</span>`;
-        else if (ms.status === 'active' && ms.started_utc) timeHtml = `<span class="ms-time mono">${SVG.clock(11, true)} ${fmtElapsed(ms.started_utc)}</span>`;
-
         return `
           <div class="ms st-${esc(ms.status)} ${sOpen ? 'sub-open' : ''}">
-            <div class="ms-row ${hasSubs ? 'clickable' : ''}" ${hasSubs ? `data-toggle-sub="${esc(ms.id)}"` : ''}>
-              <div class="ms-l">
-                <span class="ms-ico">${msIco}</span>
-                <span class="ms-id mono">${esc(ms.id)}</span>
-                <div>
-                  <div class="ms-title">
-                    <span>${esc(ms.title)}</span>
-                    ${hasSubs ? `<span class="mono" style="color:var(--text-3);font-size:11px;display:inline-flex;align-items:center;gap:2px;">${SVG.chevron('sub-chev', 12)} ${subDone}/${ms.substeps.length}</span>` : ''}
-                  </div>
-                  ${ms.note ? `<div class="ms-note">${esc(ms.note)}</div>` : ''}
-                </div>
-              </div>
-              <div class="ms-r">
-                ${ms.metric ? `<span class="ms-metric mono">${esc(ms.metric)}</span>` : ''}
-                ${timeHtml}
-              </div>
+            <div class="ms-line ${hasSubs ? 'clickable' : ''}" ${hasSubs ? `data-sub="${esc(ms.id)}"` : ''}>
+              <div class="ms-l">${msIco}<span class="ms-id mono">${esc(ms.id)}</span><span class="ms-t">${esc(ms.title)}</span></div>
+              <div class="ms-r mono">${msRight}</div>
             </div>
             ${subsHtml}
           </div>`;
@@ -789,104 +534,78 @@ function render(d) {
 
       return `
         <div class="phase is-${pst} ${open ? 'open' : ''}" id="phase-${esc(ph.id)}">
-          <button class="phase-head" data-toggle-phase="${esc(ph.id)}">
-            <div class="phase-l">
-              ${ico}
-              <div class="phase-title-wrap">
-                <div class="phase-title"><span class="phase-code mono">${esc(ph.code)}</span> ${esc(ph.title)} <span class="phase-code mono">${phDone}/${phTot}</span></div>
-                <div class="phase-sub">${esc(ph.summary_metric || '')}</div>
-              </div>
-            </div>
-            <div class="phase-r">
-              ${ph.projected_unlock ? `<span class="unlock-pill mono">${esc(ph.projected_unlock)}</span>` : ''}
-              ${SVG.chevron('chev-svg', 14)}
+          <button class="phase-btn" data-ph="${esc(ph.id)}">
+            <div class="ph-l">${ico}<span class="ph-name">${esc(ph.title)}</span></div>
+            <div class="ph-r mono">
+              ${actTime ? `${SVG.clock(12, true)}<span>${actTime}</span>` : `<span>${phDone}/${phTot}</span>`}
+              ${SVG.chev(13)}
             </div>
           </button>
-          <div class="phase-body"><div class="ms-list">${msHtml}</div></div>
+          <div class="phase-body">${msHtml}</div>
         </div>`;
     }).join('');
 
     return `
-      <article class="engine-card" data-accent="${esc(eng.accent || 'cyan')}">
-        <div class="engine-head">
-          <div>
-            <div class="engine-code mono">
-              <span>${esc(eng.code)}</span>
-              <span class="hb ${hb.fresh ? 'fresh' : ''}">${SVG.pulseWave(13)} ${esc(hb.text)}</span>
-            </div>
-            <div class="engine-name">${esc(eng.name)}</div>
-            <div class="engine-meta">${esc(eng.owner_line || '')} · 目标 ${esc(eng.target_cost || '')}</div>
-          </div>
-          <div class="proj-box">
-            <div class="proj-kicker"><span>攻克后预计</span>${SVG.arrowUpRight(11)}</div>
-            <div class="proj-score mono">${esc(eng.projected_score)}</div>
-            <div class="proj-delta mono">${esc(eng.projected_delta)} · ${esc(eng.projected_rank)}</div>
-          </div>
+      <article class="card">
+        <div class="card-head">
+          <div class="card-title">${esc(eng.name)}</div>
+          <div class="card-proj mono"><small>预计</small> ${esc(eng.projected_score || '—')}</div>
         </div>
-        ${renderEngineTopology(eng)}
-        <div class="rail-wrap">
-          <div class="rail-top mono"><span>里程碑 ${doneCount}/${allMs.length}</span><span>${pct}%</span></div>
-          <div class="rail">${railHtml}</div>
-        </div>
-        ${focusHtml}
-        <div class="phases">${phasesHtml}</div>
-        ${eng.bonus_note ? `<div class="bonus-strip">${SVG.spark(13)}<span>${esc(eng.bonus_note)}</span></div>` : ''}
+        ${renderDynamicCircuit(eng, idx)}
+        <div class="tree">${phasesHtml}</div>
       </article>`;
   }).join('');
 
-  container.querySelectorAll('[data-toggle-phase]').forEach(btn => {
+  container.querySelectorAll('[data-ph]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-toggle-phase');
-      const card = btn.closest('.phase');
-      const next = !card.classList.contains('open');
+      const id = btn.getAttribute('data-ph');
+      const el = btn.closest('.phase');
+      const next = !el.classList.contains('open');
       state.phaseOpen[id] = next;
-      card.classList.toggle('open', next);
+      el.classList.toggle('open', next);
     });
   });
-  container.querySelectorAll('[data-toggle-sub]').forEach(row => {
+  container.querySelectorAll('[data-sub]').forEach(row => {
     row.addEventListener('click', () => {
-      const id = row.getAttribute('data-toggle-sub');
-      const msEl = row.closest('.ms');
-      const next = !msEl.classList.contains('sub-open');
+      const id = row.getAttribute('data-sub');
+      const el = row.closest('.ms');
+      const next = !el.classList.contains('sub-open');
       state.subOpen[id] = next;
-      msEl.classList.toggle('sub-open', next);
+      el.classList.toggle('sub-open', next);
     });
   });
-  container.querySelectorAll('[data-jump-phase]').forEach(node => {
+  container.querySelectorAll('[data-jump]').forEach(node => {
     node.addEventListener('click', () => {
-      const phId = node.getAttribute('data-jump-phase');
-      const el = document.getElementById('phase-' + phId);
+      const id = node.getAttribute('data-jump');
+      const el = document.getElementById('phase-' + id);
       if (!el) return;
-      state.phaseOpen[phId] = true;
+      state.phaseOpen[id] = true;
       el.classList.add('open');
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
 
-  document.getElementById('drawer-summary').textContent = `${(r.top15 || []).length} 条榜单 · ${(d.events || []).length} 条战报`;
+  const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
+  const lbText = r.rank1
+    ? `#1 ${Number(r.rank1.score).toFixed(digits)} · #3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · 金牌线 #10 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
+    : (d.policy_badge || '排行榜');
+  document.getElementById('foot-metrics').textContent = lbText;
+  document.getElementById('foot-right').innerHTML =
+    `<span>${Number(f.cu_balance || 0).toFixed(0)} CU · ${remQ}/${f.quota_total || 5}</span>` +
+    `<span style="display:inline-flex;align-items:center;gap:4px;" title="距每日 08:00 额度重置">${SVG.clock(12, true)}${fmtReset(d.reset_in_sec)}</span>`;
+
   document.getElementById('lb-table').innerHTML = (r.top15 || []).length
     ? r.top15.map(row => `
       <tr class="${row.is_us ? 'is-us' : ''} ${row.rank === 10 ? 'gold-cut' : ''}">
-        <td class="lb-rank">#${row.rank}</td>
+        <td style="width:36px;">#${row.rank}</td>
         <td>${esc(row.team)}</td>
-        <td class="lb-score">${Number(row.score).toFixed(3)}</td>
+        <td class="lb-score">${Number(row.score).toFixed(digits)}</td>
       </tr>`).join('')
-    : '<tr><td colspan="3" style="color:var(--text-3)">未配置外部排行榜源 (RADAR_FILE)</td></tr>';
-
-  document.getElementById('event-list').innerHTML = (d.events || []).slice(0, 8).map(ev => `
-    <div class="ev ev-${esc(ev.level || 'info')}">
-      <span class="ev-time mono">${fmtTime(ev.utc)}</span>
-      <div><strong style="color:var(--text);font-weight:500;">[${esc(ev.tag)}]</strong> ${esc(ev.text)}</div>
-    </div>`).join('');
-
-  const nowStr = new Date().toLocaleTimeString([], { hour12: false });
-  document.getElementById('sync-line').innerHTML = `<span class="inline-chip">${SVG.clock(11, false)} 数据 ${fmtTime(d.updated_utc)} · 同步 ${nowStr}</span>`;
+    : '<tr><td colspan="3" style="color:var(--text-3)">暂无外部排行榜数据</td></tr>';
 }
 
 function updateRing(sec) {
   const arc = document.getElementById('ring-arc');
-  if (!arc) return;
-  arc.style.strokeDashoffset = String(40.84 * (1 - Math.max(0, sec) / 30));
+  if (arc) arc.style.strokeDashoffset = String(40.84 * (1 - Math.max(0, sec) / 30));
 }
 
 async function fetchState() {
@@ -918,8 +637,10 @@ document.querySelectorAll('.seg button').forEach(btn => {
   });
 });
 
-document.getElementById('drawer-toggle').addEventListener('click', () => {
-  document.getElementById('drawer').classList.toggle('open');
+document.getElementById('lb-toggle').addEventListener('click', () => {
+  const p = document.getElementById('lb-panel');
+  p.classList.toggle('open');
+  document.getElementById('lb-chev').style.transform = p.classList.contains('open') ? 'rotate(90deg)' : '';
 });
 document.getElementById('refresh-btn').addEventListener('click', () => fetchState());
 
@@ -936,9 +657,9 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
       body: JSON.stringify({ key }),
     });
     if (res.ok) await fetchState();
-    else errEl.textContent = '密钥错误，请重试';
+    else errEl.textContent = '密钥错误';
   } catch {
-    errEl.textContent = '网络异常，请重试';
+    errEl.textContent = '网络异常';
   }
 });
 
