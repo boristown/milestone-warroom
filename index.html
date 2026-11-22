@@ -32,7 +32,7 @@
     line-height: 1.4;
   }
   .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .wrap { max-width: 1360px; margin: 0 auto; padding: 14px 18px 28px; }
+  .wrap { max-width: 100%; margin: 0 auto; padding: 12px 16px 24px; }
 
   @keyframes spinSlow { to { transform: rotate(360deg); } }
   @keyframes pulseSoft { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
@@ -114,29 +114,37 @@
   .lb-row.us { color: var(--cyan); font-weight: 600; background: rgba(56,189,248,0.08); }
   .lb-row.gold { border-bottom: 1px dashed rgba(245,158,11,0.5); }
 
-  /* Zero-Box High-Density Split Columns */
+  /* Full-Width Side-by-Side Columns (Automatically Fits 1 / 2 / 3 Engines on One Screen) */
   .cols {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-    gap: 28px;
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
   }
-  @media (max-width: 540px) { .cols { grid-template-columns: 1fr; } }
+  @media (max-width: 1020px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .cols { grid-template-columns: 1fr; } }
 
   .col {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
+  }
+  @media (min-width: 1021px) {
+    .col + .col {
+      border-left: 1px solid var(--line);
+      padding-left: 18px;
+    }
   }
   .col-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
   }
-  .col-name { font-size: 15px; font-weight: 600; color: var(--text); }
-  .col-proj { font-size: 14px; font-weight: 600; color: var(--green); display: inline-flex; align-items: baseline; gap: 5px; }
-  .col-proj small { font-size: 11px; color: var(--text-3); font-weight: 400; font-family: var(--sans); }
+  .col-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-proj { font-size: 13.5px; font-weight: 600; color: var(--green); display: inline-flex; align-items: baseline; gap: 4px; flex-shrink: 0; }
+  .col-proj small { font-size: 10.5px; color: var(--text-3); font-weight: 400; font-family: var(--sans); }
 
   /* Unified Frameless Segmented Stage Track (100% Data-Driven, Matches Flat Aesthetic Below) */
   .track {
@@ -249,10 +257,10 @@
   }
   .st-row {
     display: grid;
-    grid-template-columns: 16px 54px 22px minmax(0, 1fr);
+    grid-template-columns: 14px 48px 18px minmax(0, 1fr);
     align-items: start;
-    gap: 7px;
-    padding: 4px 5px;
+    gap: 5px;
+    padding: 3.5px 4px;
     border-radius: 5px;
     cursor: pointer;
   }
@@ -480,7 +488,9 @@ function render(d) {
     </div>`).join('');
 
   const container = document.getElementById('engines');
-  container.innerHTML = (d.engines || []).map(eng => {
+  const engList = d.engines || [];
+  container.style.setProperty('--cols', String(Math.max(1, Math.min(engList.length, 3))));
+  container.innerHTML = engList.map(eng => {
     const phasesHtml = (eng.phases || []).map(ph => {
       const pst = phaseStatus(ph);
       const open = isPhaseOpen(ph, pst);
