@@ -4,22 +4,22 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow, noarchive" />
-<title>WAR-ROOM // 进展看板</title>
+<title>WAR-ROOM</title>
 <style>
   :root {
-    --bg: #050608;
-    --card: #0a0d13;
-    --line: rgba(255, 255, 255, 0.07);
-    --line-hi: rgba(255, 255, 255, 0.14);
+    --bg: #040507;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-hi: rgba(255, 255, 255, 0.16);
     --text: #eef2f7;
-    --text-2: #8b9bb4;
-    --text-3: #526077;
+    --text-2: #94a3b8;
+    --text-3: #56637a;
     --cyan: #38bdf8;
     --indigo: #818cf8;
     --green: #34d399;
     --amber: #f59e0b;
+    --red: #fb7185;
     --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,312 +28,240 @@
     color: var(--text);
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
+    font-size: 13px;
+    line-height: 1.4;
   }
   .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 56px; }
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 12px 16px 28px; }
 
   @keyframes spinSlow { to { transform: rotate(360deg); } }
-  @keyframes pulseSoft { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+  @keyframes pulseSoft { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
   @keyframes wireFlow { from { stroke-dashoffset: 36; } to { stroke-dashoffset: 0; } }
-  @keyframes dropHint { 0%,100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(2.5px); opacity: .35; } }
-  .svg-ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
-  .spin { transform-origin: 9px 9px; animation: spinSlow 7s linear infinite; }
+  @keyframes dropHint { 0%,100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(2.5px); opacity: .3; } }
+  .ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  .spin { transform-origin: 8px 8px; animation: spinSlow 5s linear infinite; }
   .clock-hand { transform-origin: 8px 8px; animation: spinSlow 24s linear infinite; }
-  .pulse { animation: pulseSoft 2.2s ease-in-out infinite; }
-  .wire-flow { stroke-dasharray: 3 15; animation: wireFlow 2.8s linear infinite; }
-  .drop-hint { animation: dropHint 1.9s ease-in-out infinite; }
+  .pulse { animation: pulseSoft 1.8s ease-in-out infinite; }
+  .wire-flow { stroke-dasharray: 3 15; animation: wireFlow 2.6s linear infinite; }
+  .drop-hint { animation: dropHint 1.8s ease-in-out infinite; }
 
-  /* Auth Gate */
-  .gate { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: 24px; }
+  /* Minimal Passcode Gate */
+  .gate { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: 20px; }
   .gate.show { display: flex; }
-  .gate-card { width: 100%; max-width: 340px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; }
-  .gate-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; letter-spacing: 0.04em; }
-  .gate-input { width: 100%; background: #050608; border: 1px solid var(--line-hi); border-radius: 10px; padding: 11px 13px; color: var(--text); font-family: var(--mono); font-size: 14px; outline: none; margin-bottom: 12px; }
+  .gate-form { display: flex; gap: 8px; width: 100%; max-width: 320px; }
+  .gate-input { flex: 1; background: #0a0d13; border: 1px solid var(--line-hi); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--mono); font-size: 13px; outline: none; }
   .gate-input:focus { border-color: var(--cyan); }
-  .gate-btn { width: 100%; background: var(--text); color: #050608; border: none; border-radius: 10px; padding: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
-  .gate-err { color: #fb7185; font-size: 12px; margin-top: 10px; min-height: 16px; }
+  .gate-btn { background: var(--text); color: #040507; border: none; border-radius: 8px; padding: 9px 16px; font-weight: 600; cursor: pointer; font-size: 13px; }
 
   #app { display: none; }
   #app.show { display: block; }
 
-  /* Whisper-Quiet Single-Line Header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
-  .score-flow { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .score-now { font-size: 14px; color: var(--text-2); display: inline-flex; align-items: center; gap: 7px; }
-  .score-now strong { color: var(--text); font-weight: 600; font-size: 16px; }
-  .score-arrow { color: var(--text-3); font-size: 13px; }
-  .score-proj { font-size: 14px; color: var(--text-2); display: inline-flex; align-items: baseline; gap: 9px; }
-  .score-proj strong { color: var(--green); font-size: 18px; font-weight: 600; }
-  .score-combo { color: var(--cyan); font-size: 12.5px; }
-
-  .controls { display: flex; align-items: center; gap: 8px; }
-  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 9px; padding: 2px; }
-  .seg button { background: transparent; border: none; color: var(--text-3); font-size: 12px; padding: 5px 11px; border-radius: 7px; cursor: pointer; font-family: var(--sans); transition: color .15s, background .15s; }
-  .seg button:hover { color: var(--text-2); }
-  .seg button.active { background: rgba(255,255,255,0.09); color: var(--text); }
-
-  .sync-btn {
-    background: var(--card);
-    border: 1px solid var(--line);
-    color: var(--text-3);
-    border-radius: 9px;
-    padding: 5px 9px;
-    font-size: 11.5px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .sync-btn:hover { color: var(--text); border-color: var(--line-hi); }
-
-  /* Responsive Auto-Grid for Any Number of Engines */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 20px;
-  }
-  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 24px 22px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-  .card-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
-  .card-proj {
-    font-size: 17.5px;
-    font-weight: 600;
-    color: var(--green);
-    display: inline-flex;
-    align-items: baseline;
-    gap: 5px;
-    flex-shrink: 0;
-  }
-  .card-proj small { font-size: 11px; color: var(--text-3); font-weight: 400; }
-
-  /* Floating Auto-Layout SVG Circuit */
-  .circuit { width: 100%; display: block; overflow: visible; }
-  .c-node { cursor: pointer; }
-
-  /* Pure Collapsible Milestone Tree */
-  .tree { display: flex; flex-direction: column; }
-  .phase { border-top: 1px solid var(--line); }
-  .phase:first-child { border-top: none; }
-
-  .phase-btn {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: inherit;
-    padding: 13px 2px;
+  /* Single Ultra-Dense Telemetry Ribbon (ALL global numbers in 1 line, zero decorative padding) */
+  .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .bar-l { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .bar-r { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-3); }
+  .score-main { font-size: 14px; color: var(--text); font-weight: 600; }
+  .score-proj { font-size: 14px; color: var(--green); font-weight: 600; }
+  .score-combo { color: var(--cyan); }
+  .dim { color: var(--text-3); }
+  .lb-trigger { background: none; border: none; color: var(--text-2); font-family: var(--mono); font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 0; }
+  .lb-trigger:hover { color: var(--text); }
+
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { background: transparent; border: none; color: var(--text-3); font-size: 11px; padding: 3px 9px; cursor: pointer; font-family: var(--sans); }
+  .seg button.active { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  /* Collapsible Inline LB Strip */
+  .lb-drawer { display: none; padding: 8px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .lb-drawer.open { display: block; }
+  .lb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 3px 18px; font-size: 11.5px; }
+  .lb-row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 4px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .lb-row.us { color: var(--cyan); font-weight: 600; background: rgba(56,189,248,0.08); }
+  .lb-row.gold { border-bottom: 1px dashed rgba(245,158,11,0.5); }
+
+  /* Zero-Box High-Density Split Columns */
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 24px;
+  }
+  @media (max-width: 540px) { .cols { grid-template-columns: 1fr; } }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .col-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .col-proj { font-size: 15px; font-weight: 600; color: var(--green); }
+
+  /* Auto-Layout SVG Circuit (Compact 60px, zero borders) */
+  .circuit { width: 100%; display: block; overflow: visible; }
+  .c-node { cursor: pointer; }
+
+  /* Ultra-Tight Collapsible Progress Tree */
+  .tree { border-top: 1px solid var(--line); }
+  .phase { border-bottom: 1px solid var(--line); }
+  .ph-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 7px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     cursor: pointer;
     text-align: left;
     font-family: var(--sans);
   }
-  .phase-btn:hover .ph-name { color: #ffffff; }
-  .ph-l { display: flex; align-items: center; gap: 11px; min-width: 0; }
-  .ph-name { font-size: 13.5px; font-weight: 500; color: var(--text); transition: color .15s; }
-  .phase.is-queued .ph-name { color: var(--text-2); }
-  .ph-r { display: inline-flex; align-items: center; gap: 9px; flex-shrink: 0; font-size: 12px; color: var(--text-3); }
+  .ph-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .ph-t { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .phase.is-queued .ph-t { color: var(--text-3); }
+  .ph-r { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-3); flex-shrink: 0; }
   .phase.is-active .ph-r { color: var(--amber); }
-  .chev { color: var(--text-3); transition: transform .18s ease; }
+  .chev { color: var(--text-3); transition: transform .15s; }
   .phase.open .chev { transform: rotate(90deg); }
 
-  .phase-body { display: none; padding: 0 0 12px 28px; }
-  .phase.open .phase-body { display: block; }
+  .ph-body { display: none; padding: 0 0 7px 22px; }
+  .phase.open .ph-body { display: block; }
 
-  .ms { padding: 6px 0; }
-  .ms-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
-  .ms-line.clickable { cursor: pointer; }
-  .ms-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .ms-id { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+  .ms { padding: 3px 0; }
+  .ms-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
+  .ms-row.click { cursor: pointer; }
+  .ms-l { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .ms-id { font-size: 10.5px; color: var(--text-3); flex-shrink: 0; }
   .ms.st-done .ms-id { color: var(--green); }
   .ms.st-active .ms-id { color: var(--amber); }
   .ms-t { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ms.st-active .ms-t { color: var(--text); font-weight: 500; }
-  .ms-r { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-3); flex-shrink: 0; }
+  .ms.st-active .ms-t { color: var(--text); }
+  .ms-r { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); flex-shrink: 0; }
   .ms.st-active .ms-r { color: var(--amber); }
 
-  .subs {
-    display: none;
-    margin: 7px 0 2px 7px;
-    padding-left: 14px;
-    border-left: 1px solid var(--line-hi);
-    flex-direction: column;
-    gap: 6px;
-  }
-  .ms.sub-open .subs { display: flex; }
-  .sub { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; padding: 3px 0; }
-  .sub-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .sub-id { font-size: 10.5px; color: var(--text-3); flex-shrink: 0; }
-  .sub.st-done .sub-id { color: var(--green); }
-  .sub.st-active .sub-id { color: var(--amber); font-weight: 600; }
-  .sub-t { color: var(--text-3); }
+  .subs { display: none; margin: 3px 0 2px 6px; padding-left: 11px; border-left: 1px solid var(--line-hi); }
+  .ms.sub-open .subs { display: block; }
+  .sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; padding: 2px 0; }
+  .sub-l { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .sub-t { color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub.st-done .sub-t { color: var(--text-2); }
   .sub.st-active .sub-t { color: var(--text); }
-  .sub-r { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+  .sub-r { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-3); flex-shrink: 0; }
   .sub.st-active .sub-r { color: var(--amber); }
 
-  /* Subtle Single-Line Footer & Optional LB Drawer */
-  .foot {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
+  /* Real-Time Streaming Experiment Feed (Trying -> Pass / Fail) */
+  .stream {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 2px;
     font-size: 11.5px;
-    color: var(--text-3);
   }
-  .foot-btn {
-    background: none;
-    border: none;
-    color: var(--text-3);
-    font-family: var(--mono);
-    font-size: 11.5px;
+  .st-row {
+    display: grid;
+    grid-template-columns: 16px 52px 24px minmax(0, 1fr);
+    align-items: start;
+    gap: 7px;
+    padding: 4px 5px;
+    border-radius: 5px;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0;
   }
-  .foot-btn:hover { color: var(--text-2); }
-
-  .lb-panel { display: none; margin-top: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
-  .lb-panel.open { display: block; }
-  .lb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .lb-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.035); color: var(--text-2); }
-  .lb-table tr.is-us td { color: var(--cyan); font-weight: 600; }
-  .lb-table tr.gold-cut td { border-bottom: 1px dashed rgba(245,158,11,0.4); }
-  .lb-score { text-align: right; }
+  .st-row:hover { background: rgba(255,255,255,0.03); }
+  .st-row.st-trying { background: rgba(245,158,11,0.07); }
+  .st-ts { color: var(--text-3); font-size: 10.5px; padding-top: 1px; }
+  .st-w { color: var(--cyan); font-size: 10.5px; font-weight: 600; padding-top: 1px; }
+  .st-msg { min-width: 0; overflow: hidden; }
+  .st-act { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-row.st-trying .st-act { color: var(--text); }
+  .st-row.expanded .st-act, .st-row.expanded .st-res { white-space: normal; word-break: break-word; }
+  .st-res { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-row.st-pass .st-res { color: var(--green); }
+  .st-row.st-fail .st-res { color: var(--red); }
+  .st-row.st-trying .st-res { color: var(--amber); }
 </style>
 </head>
 <body>
 
 <div id="gate" class="gate">
-  <div class="gate-card">
-    <div class="gate-title mono">WAR-ROOM</div>
-    <form id="auth-form">
-      <input id="auth-key" class="gate-input" type="password" placeholder="Access Key" autocomplete="current-password" required />
-      <button class="gate-btn" type="submit">解锁</button>
-    </form>
-    <div id="gate-err" class="gate-err"></div>
-  </div>
+  <form id="auth-form" class="gate-form">
+    <input id="auth-key" class="gate-input" type="password" placeholder="Access Key" autocomplete="current-password" required />
+    <button class="gate-btn" type="submit">→</button>
+  </form>
 </div>
 
 <div id="app" class="wrap">
-  <header class="header">
-    <div class="score-flow mono">
-      <span class="score-now">
-        <svg class="svg-ico" width="10" height="10" viewBox="0 0 12 12" aria-hidden="true">
-          <circle cx="6" cy="6" r="2.6" fill="#34d399"/>
-          <circle cx="6" cy="6" r="2.6" fill="none" stroke="#34d399" stroke-width="1">
-            <animate attributeName="r" from="2.6" to="5.6" dur="2.2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" from="0.8" to="0" dur="2.2s" repeatCount="indefinite"/>
-          </circle>
-        </svg>
+  <header class="bar mono">
+    <div class="bar-l">
+      <span style="display:inline-flex;align-items:center;gap:6px;">
+        <svg class="ico" width="10" height="10" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.6" fill="#34d399"/><circle cx="6" cy="6" r="2.6" fill="none" stroke="#34d399" stroke-width="1"><animate attributeName="r" from="2.6" to="5.6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.85" to="0" dur="2s" repeatCount="indefinite"/></circle></svg>
         <span id="our-rank">—</span>
-        <strong id="our-score">—</strong>
-      </span>
-      <span class="score-arrow">→</span>
-      <span class="score-proj">
-        <strong id="proj-single">—</strong>
+        <span class="score-main" id="our-score">—</span>
+        <span class="dim">→</span>
+        <span class="score-proj" id="proj-single">—</span>
         <span class="score-combo" id="proj-combo"></span>
       </span>
+      <button class="lb-trigger" id="lb-toggle">
+        <span id="lb-brief">—</span>
+        <svg class="ico chev" id="lb-chev" width="11" height="11" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
-
-    <div class="controls">
-      <div class="seg" role="tablist">
+    <div class="bar-r">
+      <span id="fleet-brief">—</span>
+      <div class="seg">
         <button data-mode="macro">总览</button>
         <button data-mode="focus" class="active">聚焦</button>
         <button data-mode="all">明细</button>
       </div>
-      <button class="sync-btn mono" id="refresh-btn" title="每 30 秒自动刷新">
-        <svg class="svg-ico" width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
-          <circle cx="9" cy="9" r="6.5" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.6"/>
-          <circle id="ring-arc" cx="9" cy="9" r="6.5" fill="none" stroke="#38bdf8" stroke-width="1.6"
-                  stroke-linecap="round" stroke-dasharray="40.84" stroke-dashoffset="0"
-                  transform="rotate(-90 9 9)" style="transition:stroke-dashoffset .9s linear;"/>
-        </svg>
-        <span id="countdown-30">30s</span>
-      </button>
     </div>
   </header>
 
-  <main class="grid" id="engines"></main>
-
-  <footer class="foot mono">
-    <button class="foot-btn" id="lb-toggle">
-      <span id="foot-metrics">排行榜</span>
-      <svg class="svg-ico chev" id="lb-chev" width="12" height="12" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <span id="foot-right" style="display:inline-flex;align-items:center;gap:10px;"></span>
-  </footer>
-
-  <section class="lb-panel" id="lb-panel">
-    <table class="lb-table mono" id="lb-table"></table>
+  <section class="lb-drawer mono" id="lb-drawer">
+    <div class="lb-grid" id="lb-grid"></div>
   </section>
+
+  <main class="cols" id="engines"></main>
 </div>
 
 <script>
 const SVG = {
-  check(size = 16) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" aria-label="Done"><title>已完成</title>
-      <circle cx="9" cy="9" r="7.4" fill="rgba(52,211,153,0.11)" stroke="#34d399" stroke-width="1.3"/>
-      <path d="M5.6 9.2L7.9 11.4L12.5 6.7" fill="none" stroke="#34d399" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
+  check(sz = 14) {
+    return `<svg class="ico" width="${sz}" height="${sz}" viewBox="0 0 16 16"><title>成功</title><path d="M3 8.4L6.3 11.6L13 4.7" fill="none" stroke="#34d399" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   },
-  tick(size = 14) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-label="Done"><title>已完成</title>
-      <path d="M3.2 8.4L6.4 11.5L12.8 4.8" fill="none" stroke="#34d399" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
+  fail(sz = 14) {
+    return `<svg class="ico" width="${sz}" height="${sz}" viewBox="0 0 16 16"><title>失败</title><path d="M4.2 4.2L11.8 11.8M11.8 4.2L4.2 11.8" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-linecap="round"/></svg>`;
   },
-  orbit(size = 16) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 18 18" aria-label="Active"><title>攻坚中</title>
-      <circle class="spin" cx="9" cy="9" r="7.1" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="14 6 5 6" stroke-linecap="round"/>
-      <circle class="pulse" cx="9" cy="9" r="2.5" fill="#f59e0b"/>
-    </svg>`;
+  orbit(sz = 14) {
+    return `<svg class="ico" width="${sz}" height="${sz}" viewBox="0 0 16 16"><title>进行中</title><circle class="spin" cx="8" cy="8" r="6.2" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="12 5 4 5" stroke-linecap="round"/><circle class="pulse" cx="8" cy="8" r="2.2" fill="#f59e0b"/></svg>`;
   },
-  idle(size = 15) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-label="Queued"><title>待命</title>
-      <circle cx="8" cy="8" r="5.3" fill="none" stroke="#3b475c" stroke-width="1.25"/>
-    </svg>`;
+  idle(sz = 13) {
+    return `<svg class="ico" width="${sz}" height="${sz}" viewBox="0 0 16 16"><title>待命</title><circle cx="8" cy="8" r="4.8" fill="none" stroke="#3b475c" stroke-width="1.3"/></svg>`;
   },
-  clock(size = 12, anim = false) {
-    return `<svg class="svg-ico" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.85"/>
-      <line x1="8" y1="8" x2="8" y2="4.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" class="${anim ? 'clock-hand' : ''}"/>
-      <line x1="8" y1="8" x2="10.6" y2="9.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-    </svg>`;
+  clock(sz = 11, anim = false) {
+    return `<svg class="ico" width="${sz}" height="${sz}" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.35" opacity="0.85"/><line x1="8" y1="8" x2="8" y2="4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" class="${anim ? 'clock-hand' : ''}"/><line x1="8" y1="8" x2="10.6" y2="9.3" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>`;
   },
-  chev(size = 13) {
-    return `<svg class="svg-ico chev" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
+  chev(sz = 12) {
+    return `<svg class="ico chev" width="${sz}" height="${sz}" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   },
 };
 
-const state = { mode: 'focus', phaseOpen: {}, subOpen: {}, data: null, tick: 30 };
+const state = { mode: 'focus', phaseOpen: {}, subOpen: {}, data: null, es: null };
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -346,13 +274,17 @@ function fmtElapsed(iso) {
   const diff = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
   if (diff < 60) return diff + 's';
   const m = Math.floor(diff / 60);
-  if (m < 60) return m + 'm';
-  return Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0') + 'm';
+  return m < 60 ? m + 'm' : Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0') + 'm';
 }
-function fmtTime(iso) {
+function fmtHMS(iso) {
+  if (!iso) return '--:--:--';
+  const d = new Date(iso);
+  return isNaN(d) ? '--:--:--' : d.toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+function fmtHM(iso) {
   if (!iso) return '--:--';
   const d = new Date(iso);
-  return isNaN(d) ? '--:--' : d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
+  return isNaN(d) ? '--:--' : d.toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false, hour: '2-digit', minute: '2-digit' });
 }
 function fmtReset(sec) {
   if (sec == null) return '--:--';
@@ -382,79 +314,6 @@ function shortLabel(text, maxLen = 8) {
   const clean = String(text || '').replace(/[（(].*?[)）]/g, '').split(/[&·]/)[0].trim();
   return clean.length > maxLen ? clean.slice(0, maxLen) : clean;
 }
-
-/**
- * 100% Data-Driven Auto-Layout SVG Circuit Flow:
- * Adapts automatically to ANY number of phases (2..N), ANY milestone changes,
- * and optional ceiling_label — ZERO UI redraw ever required.
- */
-function renderDynamicCircuit(eng, idx) {
-  const phases = eng.phases || [];
-  if (!phases.length) return '';
-  const n = phases.length;
-  const W = 460, H = 74, padX = 10, gap = 14;
-  const boxW = Math.floor((W - padX * 2 - gap * (n - 1)) / n);
-  const accent = eng.accent === 'indigo' ? '#818cf8' : '#38bdf8';
-  const uid = 'g' + idx + '_' + esc(eng.id || 'e').replace(/[^a-zA-Z0-9]/g, '');
-  const ceiling = eng.ceiling_label || (eng.topology && eng.topology.ceiling_label) || '';
-
-  const nodesHtml = phases.map((ph, i) => {
-    const st = phaseStatus(ph);
-    const x = padX + i * (boxW + gap);
-    const cx = x + boxW / 2;
-    const isOver = Boolean(ceiling) && st === 'active';
-    const y = isOver ? 10 : 20;
-    const h = isOver ? 52 : 42;
-    const label = esc(ph.short_title || shortLabel(ph.title, n >= 4 ? 6 : 8));
-    const actId = activeNodeId(ph);
-    const msDone = (ph.milestones || []).filter(m => m.status === 'done').length;
-    const msTot = (ph.milestones || []).length;
-    const subTxt = st === 'done' ? '✓' : st === 'active' ? (actId || `${msDone}/${msTot}`) : `${msDone}/${msTot}`;
-
-    const fill = st === 'done' ? 'rgba(52,211,153,0.1)' : st === 'active' ? `url(#${uid}F)` : 'rgba(255,255,255,0.02)';
-    const stroke = st === 'done' ? '#34d399' : st === 'active' ? `url(#${uid}S)` : 'rgba(255,255,255,0.12)';
-    const dash = st === 'queued' ? '3 3' : '';
-    const titleColor = st === 'done' ? '#a7f3d0' : st === 'active' ? '#ffffff' : '#7b8ba3';
-    const subColor = st === 'done' ? '#34d399' : st === 'active' ? '#fbbf24' : '#526077';
-
-    return `
-      <g class="c-node" data-jump="${esc(ph.id)}">
-        <rect x="${x}" y="${y}" width="${boxW}" height="${h}" rx="10"
-              fill="${fill}" stroke="${stroke}" stroke-width="${st === 'active' ? 1.35 : 1.15}" stroke-dasharray="${dash}"/>
-        ${isOver ? `<path class="drop-hint" d="M${cx - 4} 2 L${cx} 6.5 L${cx + 4} 2" fill="none" stroke="#f59e0b" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
-        <text x="${cx}" y="${y + (isOver ? 24 : 18)}" text-anchor="middle" fill="${titleColor}" font-size="10.5" font-weight="${st === 'active' ? 600 : 500}" font-family="ui-monospace,monospace">${label}</text>
-        <text x="${cx}" y="${y + (isOver ? 40 : 33)}" text-anchor="middle" fill="${subColor}" font-size="9" font-family="ui-monospace,monospace">${esc(subTxt)}</text>
-      </g>`;
-  }).join('');
-
-  return `
-  <svg class="circuit" viewBox="0 0 ${W} ${H}" aria-label="${esc(eng.name)} 进展拓扑">
-    <defs>
-      <linearGradient id="${uid}F" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28">
-          <animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="4s" repeatCount="indefinite"/>
-        </stop>
-        <stop offset="100%" stop-color="${accent}" stop-opacity="0.14">
-          <animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="4s" repeatCount="indefinite"/>
-        </stop>
-      </linearGradient>
-      <linearGradient id="${uid}S" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#f59e0b">
-          <animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="4s" repeatCount="indefinite"/>
-        </stop>
-        <stop offset="100%" stop-color="${accent}">
-          <animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="4s" repeatCount="indefinite"/>
-        </stop>
-      </linearGradient>
-    </defs>
-    ${ceiling ? `<line x1="6" y1="18" x2="${W - 6}" y2="18" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
-      <text x="8" y="13" fill="#38bdf8" font-size="8.5" font-family="ui-monospace,monospace" opacity="0.75">${esc(ceiling)}</text>` : ''}
-    <line x1="6" y1="41" x2="${W - 6}" y2="41" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
-    <line x1="6" y1="41" x2="${W - 6}" y2="41" stroke="${accent}" stroke-width="1.2" opacity="0.55" class="wire-flow"/>
-    ${nodesHtml}
-  </svg>`;
-}
-
 function isPhaseOpen(ph, st) {
   if (ph.id in state.phaseOpen) return state.phaseOpen[ph.id];
   if (state.mode === 'all') return true;
@@ -468,9 +327,60 @@ function isSubOpen(ms) {
   return ms.status === 'active';
 }
 
+function renderDynamicCircuit(eng, idx) {
+  const phases = eng.phases || [];
+  if (!phases.length) return '';
+  const n = phases.length;
+  const W = 480, H = 60, padX = 4, gap = 12;
+  const boxW = Math.floor((W - padX * 2 - gap * (n - 1)) / n);
+  const accent = eng.accent === 'indigo' ? '#818cf8' : '#38bdf8';
+  const uid = 'g' + idx + '_' + esc(eng.id || 'e').replace(/[^a-zA-Z0-9]/g, '');
+  const ceiling = eng.ceiling_label || (eng.topology && eng.topology.ceiling_label) || '';
+
+  const nodes = phases.map((ph, i) => {
+    const st = phaseStatus(ph);
+    const x = padX + i * (boxW + gap);
+    const cx = x + boxW / 2;
+    const isOver = Boolean(ceiling) && st === 'active';
+    const y = isOver ? 8 : 16;
+    const h = isOver ? 46 : 38;
+    const label = esc(ph.short_title || shortLabel(ph.title, n >= 4 ? 6 : 8));
+    const actId = activeNodeId(ph);
+    const msDone = (ph.milestones || []).filter(m => m.status === 'done').length;
+    const msTot = (ph.milestones || []).length;
+    const subTxt = st === 'done' ? '✓' : st === 'active' ? (actId || `${msDone}/${msTot}`) : `${msDone}/${msTot}`;
+    const fill = st === 'done' ? 'rgba(52,211,153,0.1)' : st === 'active' ? `url(#${uid}F)` : 'rgba(255,255,255,0.02)';
+    const stroke = st === 'done' ? '#34d399' : st === 'active' ? `url(#${uid}S)` : 'rgba(255,255,255,0.12)';
+    return `
+      <g class="c-node" data-jump="${esc(ph.id)}">
+        <rect x="${x}" y="${y}" width="${boxW}" height="${h}" rx="7" fill="${fill}" stroke="${stroke}" stroke-width="${st === 'active' ? 1.35 : 1.1}" stroke-dasharray="${st === 'queued' ? '3 3' : ''}"/>
+        ${isOver ? `<path class="drop-hint" d="M${cx - 3.5} 1 L${cx} 5 L${cx + 3.5} 1" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+        <text x="${cx}" y="${y + (isOver ? 21 : 16)}" text-anchor="middle" fill="${st === 'done' ? '#a7f3d0' : st === 'active' ? '#fff' : '#7b8ba3'}" font-size="10" font-weight="${st === 'active' ? 600 : 500}" font-family="ui-monospace,monospace">${label}</text>
+        <text x="${cx}" y="${y + (isOver ? 36 : 30)}" text-anchor="middle" fill="${st === 'done' ? '#34d399' : st === 'active' ? '#fbbf24' : '#526077'}" font-size="8.8" font-family="ui-monospace,monospace">${esc(subTxt)}</text>
+      </g>`;
+  }).join('');
+
+  return `
+  <svg class="circuit" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <linearGradient id="${uid}F" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28"><animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="3.6s" repeatCount="indefinite"/></stop>
+        <stop offset="100%" stop-color="${accent}" stop-opacity="0.14"><animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="3.6s" repeatCount="indefinite"/></stop>
+      </linearGradient>
+      <linearGradient id="${uid}S" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#f59e0b"><animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="3.6s" repeatCount="indefinite"/></stop>
+        <stop offset="100%" stop-color="${accent}"><animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="3.6s" repeatCount="indefinite"/></stop>
+      </linearGradient>
+    </defs>
+    ${ceiling ? `<line x1="2" y1="14" x2="${W - 2}" y2="14" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="4 4"/><text x="4" y="10" fill="#38bdf8" font-size="8" font-family="ui-monospace,monospace" opacity="0.75">${esc(ceiling)}</text>` : ''}
+    <line x1="2" y1="35" x2="${W - 2}" y2="35" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <line x1="2" y1="35" x2="${W - 2}" y2="35" stroke="${accent}" stroke-width="1.2" opacity="0.55" class="wire-flow"/>
+    ${nodes}
+  </svg>`;
+}
+
 function render(d) {
   state.data = d;
-  document.title = (d.mission_title || 'WAR-ROOM') + ' // 进展看板';
   const r = d.radar || {};
   const f = d.fleet || {};
   const ourScore = r.our_score ?? f.private_pb_score;
@@ -479,11 +389,25 @@ function render(d) {
   document.getElementById('our-score').textContent = ourScore != null ? Number(ourScore).toFixed(digits) : '—';
 
   const sp = (d.single_projection && d.single_projection.score)
-    || (d.engines || []).map(e => e.projected_score).filter(Boolean).join(' / ')
-    || '—';
+    || (d.engines || []).map(e => e.projected_score).filter(Boolean).join(' / ') || '—';
   document.getElementById('proj-single').textContent = sp;
   const combo = d.combo_projection && d.combo_projection.score;
   document.getElementById('proj-combo').textContent = combo ? '合龙 ' + combo : '';
+
+  document.getElementById('lb-brief').textContent = r.rank1
+    ? `#1 ${Number(r.rank1.score).toFixed(digits)} · #3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · #10 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
+    : 'Top 15';
+
+  const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
+  document.getElementById('fleet-brief').innerHTML =
+    `<span>${Number(f.cu_balance || 0).toFixed(0)} CU · ${remQ}/${f.quota_total || 5}</span> ` +
+    `<span style="display:inline-flex;align-items:center;gap:3px;">${SVG.clock(11, true)}${fmtReset(d.reset_in_sec)}</span>`;
+
+  document.getElementById('lb-grid').innerHTML = (r.top15 || []).map(row => `
+    <div class="lb-row ${row.is_us ? 'us' : ''} ${row.rank === 10 ? 'gold' : ''}">
+      <span>#${row.rank} ${esc(row.team)}</span>
+      <span>${Number(row.score).toFixed(digits)}</span>
+    </div>`).join('');
 
   const container = document.getElementById('engines');
   container.innerHTML = (d.engines || []).map((eng, idx) => {
@@ -493,38 +417,30 @@ function render(d) {
       const phDone = (ph.milestones || []).filter(m => m.status === 'done').length;
       const phTot = (ph.milestones || []).length;
       const actTime = pst === 'active' ? phaseActiveTime(ph) : '';
-      const ico = pst === 'done' ? SVG.check(17) : pst === 'active' ? SVG.orbit(17) : SVG.idle(16);
+      const ico = pst === 'done' ? SVG.check(14) : pst === 'active' ? SVG.orbit(14) : SVG.idle(13);
 
       const msHtml = (ph.milestones || []).map(ms => {
         const hasSubs = (ms.substeps || []).length > 0;
         const sOpen = hasSubs && isSubOpen(ms);
-        const msIco = ms.status === 'done' ? SVG.tick(13) : ms.status === 'active' ? SVG.orbit(14) : SVG.idle(13);
+        const msIco = ms.status === 'done' ? SVG.check(13) : ms.status === 'active' ? SVG.orbit(13) : SVG.idle(12);
         const msRight = ms.status === 'active' && ms.started_utc
           ? `${SVG.clock(11, true)}<span>${fmtElapsed(ms.started_utc)}</span>`
-          : ms.status === 'done' && ms.completed_utc
-            ? `<span>${fmtTime(ms.completed_utc)}</span>`
-            : '';
+          : ms.status === 'done' && ms.completed_utc ? `<span>${fmtHM(ms.completed_utc)}</span>` : '';
 
         const subsHtml = hasSubs ? `
           <div class="subs">
             ${ms.substeps.map(s => {
-              const sIco = s.status === 'done' ? SVG.tick(12) : s.status === 'active' ? SVG.orbit(13) : SVG.idle(12);
+              const sIco = s.status === 'done' ? SVG.check(12) : s.status === 'active' ? SVG.orbit(12) : SVG.idle(11);
               const sRight = s.status === 'active' && s.started_utc
-                ? `${SVG.clock(11, true)}<span>${fmtElapsed(s.started_utc)}</span>`
-                : s.status === 'done' && s.completed_utc
-                  ? `<span>${fmtTime(s.completed_utc)}</span>`
-                  : '';
-              return `
-                <div class="sub st-${esc(s.status)}">
-                  <div class="sub-l">${sIco}<span class="sub-id mono">${esc(s.id)}</span><span class="sub-t">${esc(s.title)}</span></div>
-                  <div class="sub-r mono">${sRight}</div>
-                </div>`;
+                ? `${SVG.clock(10, true)}<span>${fmtElapsed(s.started_utc)}</span>`
+                : s.status === 'done' && s.completed_utc ? `<span>${fmtHM(s.completed_utc)}</span>` : '';
+              return `<div class="sub st-${esc(s.status)}"><div class="sub-l">${sIco}<span class="ms-id mono">${esc(s.id)}</span><span class="sub-t">${esc(s.title)}</span></div><div class="sub-r mono">${sRight}</div></div>`;
             }).join('')}
           </div>` : '';
 
         return `
           <div class="ms st-${esc(ms.status)} ${sOpen ? 'sub-open' : ''}">
-            <div class="ms-line ${hasSubs ? 'clickable' : ''}" ${hasSubs ? `data-sub="${esc(ms.id)}"` : ''}>
+            <div class="ms-row ${hasSubs ? 'click' : ''}" ${hasSubs ? `data-sub="${esc(ms.id)}"` : ''}>
               <div class="ms-l">${msIco}<span class="ms-id mono">${esc(ms.id)}</span><span class="ms-t">${esc(ms.title)}</span></div>
               <div class="ms-r mono">${msRight}</div>
             </div>
@@ -534,81 +450,76 @@ function render(d) {
 
       return `
         <div class="phase is-${pst} ${open ? 'open' : ''}" id="phase-${esc(ph.id)}">
-          <button class="phase-btn" data-ph="${esc(ph.id)}">
-            <div class="ph-l">${ico}<span class="ph-name">${esc(ph.title)}</span></div>
-            <div class="ph-r mono">
-              ${actTime ? `${SVG.clock(12, true)}<span>${actTime}</span>` : `<span>${phDone}/${phTot}</span>`}
-              ${SVG.chev(13)}
-            </div>
+          <button class="ph-btn" data-ph="${esc(ph.id)}">
+            <div class="ph-l">${ico}<span class="ph-t">${esc(ph.title)}</span></div>
+            <div class="ph-r mono">${actTime ? `${SVG.clock(11, true)}<span>${actTime}</span>` : `<span>${phDone}/${phTot}</span>`}${SVG.chev(12)}</div>
           </button>
-          <div class="phase-body">${msHtml}</div>
+          <div class="ph-body">${msHtml}</div>
+        </div>`;
+    }).join('');
+
+    const streamHtml = (eng.stream || []).map(row => {
+      const ico = row.status === 'pass' ? SVG.check(13) : row.status === 'fail' ? SVG.fail(13) : row.status === 'trying' ? SVG.orbit(13) : SVG.idle(12);
+      return `
+        <div class="st-row st-${esc(row.status)} mono">
+          <span>${ico}</span>
+          <span class="st-ts">${fmtHMS(row.utc)}</span>
+          <span class="st-w">${esc(row.worker)}</span>
+          <div class="st-msg">
+            <div class="st-act">${esc(row.action)}</div>
+            ${row.result ? `<div class="st-res">→ ${esc(row.result)}</div>` : ''}
+          </div>
         </div>`;
     }).join('');
 
     return `
-      <article class="card">
-        <div class="card-head">
-          <div class="card-title">${esc(eng.name)}</div>
-          <div class="card-proj mono"><small>预计</small> ${esc(eng.projected_score || '—')}</div>
+      <section class="col">
+        <div class="col-head">
+          <span class="col-name">${esc(eng.name)}</span>
+          <span class="col-proj mono">→ ${esc(eng.projected_score || '—')}</span>
         </div>
         ${renderDynamicCircuit(eng, idx)}
         <div class="tree">${phasesHtml}</div>
-      </article>`;
+        ${streamHtml ? `<div class="stream">${streamHtml}</div>` : ''}
+      </section>`;
   }).join('');
 
-  container.querySelectorAll('[data-ph]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-ph');
-      const el = btn.closest('.phase');
-      const next = !el.classList.contains('open');
-      state.phaseOpen[id] = next;
-      el.classList.toggle('open', next);
-    });
-  });
-  container.querySelectorAll('[data-sub]').forEach(row => {
-    row.addEventListener('click', () => {
-      const id = row.getAttribute('data-sub');
-      const el = row.closest('.ms');
-      const next = !el.classList.contains('sub-open');
-      state.subOpen[id] = next;
-      el.classList.toggle('sub-open', next);
-    });
-  });
-  container.querySelectorAll('[data-jump]').forEach(node => {
-    node.addEventListener('click', () => {
-      const id = node.getAttribute('data-jump');
-      const el = document.getElementById('phase-' + id);
-      if (!el) return;
-      state.phaseOpen[id] = true;
-      el.classList.add('open');
-    });
-  });
-
-  const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
-  const lbText = r.rank1
-    ? `#1 ${Number(r.rank1.score).toFixed(digits)} · #3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · 金牌线 #10 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
-    : (d.policy_badge || '排行榜');
-  document.getElementById('foot-metrics').textContent = lbText;
-  document.getElementById('foot-right').innerHTML =
-    `<span>${Number(f.cu_balance || 0).toFixed(0)} CU · ${remQ}/${f.quota_total || 5}</span>` +
-    `<span style="display:inline-flex;align-items:center;gap:4px;" title="距每日 08:00 额度重置">${SVG.clock(12, true)}${fmtReset(d.reset_in_sec)}</span>`;
-
-  document.getElementById('lb-table').innerHTML = (r.top15 || []).length
-    ? r.top15.map(row => `
-      <tr class="${row.is_us ? 'is-us' : ''} ${row.rank === 10 ? 'gold-cut' : ''}">
-        <td style="width:36px;">#${row.rank}</td>
-        <td>${esc(row.team)}</td>
-        <td class="lb-score">${Number(row.score).toFixed(digits)}</td>
-      </tr>`).join('')
-    : '<tr><td colspan="3" style="color:var(--text-3)">暂无外部排行榜数据</td></tr>';
+  container.querySelectorAll('[data-ph]').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.getAttribute('data-ph'), el = btn.closest('.phase');
+    const next = !el.classList.contains('open');
+    state.phaseOpen[id] = next; el.classList.toggle('open', next);
+  }));
+  container.querySelectorAll('[data-sub]').forEach(row => row.addEventListener('click', () => {
+    const id = row.getAttribute('data-sub'), el = row.closest('.ms');
+    const next = !el.classList.contains('sub-open');
+    state.subOpen[id] = next; el.classList.toggle('sub-open', next);
+  }));
+  container.querySelectorAll('[data-jump]').forEach(n => n.addEventListener('click', () => {
+    const id = n.getAttribute('data-jump'), el = document.getElementById('phase-' + id);
+    if (el) { state.phaseOpen[id] = true; el.classList.add('open'); }
+  }));
+  container.querySelectorAll('.st-row').forEach(r => r.addEventListener('click', () => r.classList.toggle('expanded')));
 }
 
-function updateRing(sec) {
-  const arc = document.getElementById('ring-arc');
-  if (arc) arc.style.strokeDashoffset = String(40.84 * (1 - Math.max(0, sec) / 30));
+function connectStream() {
+  if (state.es) { state.es.close(); state.es = null; }
+  const es = new EventSource(apiUrl('/api/stream'), { withCredentials: true });
+  state.es = es;
+  es.onmessage = (ev) => {
+    try {
+      const data = JSON.parse(ev.data);
+      document.getElementById('gate').classList.remove('show');
+      document.getElementById('app').classList.add('show');
+      render(data);
+    } catch (e) {}
+  };
+  es.onerror = () => {
+    es.close(); state.es = null;
+    setTimeout(bootstrap, 3000);
+  };
 }
 
-async function fetchState() {
+async function bootstrap() {
   try {
     const res = await fetch(apiUrl('/api/state'), { credentials: 'same-origin' });
     if (res.status === 401) {
@@ -621,59 +532,36 @@ async function fetchState() {
     document.getElementById('gate').classList.remove('show');
     document.getElementById('app').classList.add('show');
     render(data);
-    state.tick = 30;
-    updateRing(30);
-    document.getElementById('countdown-30').textContent = '30s';
-  } catch (e) {}
+    connectStream();
+  } catch (e) {
+    setTimeout(bootstrap, 4000);
+  }
 }
 
-document.querySelectorAll('.seg button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    state.mode = btn.getAttribute('data-mode');
-    state.phaseOpen = {};
-    state.subOpen = {};
-    document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('active', b === btn));
-    if (state.data) render(state.data);
-  });
-});
+document.querySelectorAll('.seg button').forEach(btn => btn.addEventListener('click', () => {
+  state.mode = btn.getAttribute('data-mode');
+  state.phaseOpen = {}; state.subOpen = {};
+  document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('active', b === btn));
+  if (state.data) render(state.data);
+}));
 
 document.getElementById('lb-toggle').addEventListener('click', () => {
-  const p = document.getElementById('lb-panel');
-  p.classList.toggle('open');
-  document.getElementById('lb-chev').style.transform = p.classList.contains('open') ? 'rotate(90deg)' : '';
+  const d = document.getElementById('lb-drawer');
+  d.classList.toggle('open');
+  document.getElementById('lb-chev').style.transform = d.classList.contains('open') ? 'rotate(90deg)' : '';
 });
-document.getElementById('refresh-btn').addEventListener('click', () => fetchState());
 
 document.getElementById('auth-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const key = document.getElementById('auth-key').value.trim();
-  const errEl = document.getElementById('gate-err');
-  errEl.textContent = '';
-  try {
-    const res = await fetch(apiUrl('/api/auth'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({ key }),
-    });
-    if (res.ok) await fetchState();
-    else errEl.textContent = '密钥错误';
-  } catch {
-    errEl.textContent = '网络异常';
-  }
+  const res = await fetch(apiUrl('/api/auth'), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin', body: JSON.stringify({ key }),
+  });
+  if (res.ok) bootstrap();
 });
 
-setInterval(() => {
-  if (!document.getElementById('app').classList.contains('show')) return;
-  state.tick -= 1;
-  if (state.tick <= 0) fetchState();
-  else {
-    document.getElementById('countdown-30').textContent = state.tick + 's';
-    updateRing(state.tick);
-  }
-}, 1000);
-
-fetchState();
+bootstrap();
 </script>
 </body>
 </html>
