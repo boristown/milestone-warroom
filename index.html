@@ -12,7 +12,7 @@
     --line-hi: rgba(255, 255, 255, 0.16);
     --text: #eef2f7;
     --text-2: #94a3b8;
-    --text-3: #56637a;
+    --text-3: #5a6880;
     --cyan: #38bdf8;
     --indigo: #818cf8;
     --green: #34d399;
@@ -32,16 +32,18 @@
     line-height: 1.4;
   }
   .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .wrap { max-width: 1360px; margin: 0 auto; padding: 12px 16px 28px; }
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 14px 18px 28px; }
 
   @keyframes spinSlow { to { transform: rotate(360deg); } }
   @keyframes pulseSoft { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-  @keyframes dropHint { 0%,100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(2.5px); opacity: .3; } }
+  @keyframes sweepBar {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
   .ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
   .spin { transform-origin: 8px 8px; animation: spinSlow 5s linear infinite; }
   .clock-hand { transform-origin: 8px 8px; animation: spinSlow 24s linear infinite; }
   .pulse { animation: pulseSoft 1.8s ease-in-out infinite; }
-  .drop-hint { animation: dropHint 1.8s ease-in-out infinite; }
 
   /* Minimal Passcode Gate */
   .gate { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -54,36 +56,61 @@
   #app { display: none; }
   #app.show { display: block; }
 
-  /* Single Ultra-Dense Telemetry Ribbon (ALL global numbers in 1 line, zero decorative padding) */
+  /* Structured, Crystal-Clear Top Telemetry Bar */
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--line);
-    margin-bottom: 14px;
-    font-size: 12px;
+    margin-bottom: 18px;
   }
-  .bar-l { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .bar-r { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-3); }
-  .score-main { font-size: 14px; color: var(--text); font-weight: 600; }
-  .score-proj { font-size: 14px; color: var(--green); font-weight: 600; }
-  .score-combo { color: var(--cyan); }
-  .dim { color: var(--text-3); }
-  .lb-trigger { background: none; border: none; color: var(--text-2); font-family: var(--mono); font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 0; }
-  .lb-trigger:hover { color: var(--text); }
+  .bar-l, .bar-r {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .kv {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding-right: 14px;
+    margin-right: 14px;
+    border-right: 1px solid var(--line);
+  }
+  .kv:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+  .kv-k { font-size: 11px; color: var(--text-3); font-family: var(--sans); }
+  .kv-v { font-size: 13px; color: var(--text); font-weight: 600; }
+  .kv-v.green { color: var(--green); }
+  .kv-v.cyan { color: var(--cyan); }
+  .kv-sub { font-size: 11.5px; color: var(--text-2); font-weight: 400; }
+
+  .lb-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 0;
+    font-family: var(--mono);
+  }
+  .lb-btn:hover .kv-sub { color: var(--text); }
 
   .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-  .seg button { background: transparent; border: none; color: var(--text-3); font-size: 11px; padding: 3px 9px; cursor: pointer; font-family: var(--sans); }
+  .seg button { background: transparent; border: none; color: var(--text-3); font-size: 11.5px; padding: 3px 9px; cursor: pointer; font-family: var(--sans); }
   .seg button.active { background: rgba(255,255,255,0.1); color: var(--text); }
 
   /* Collapsible Inline LB Strip */
-  .lb-drawer { display: none; padding: 8px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .lb-drawer { display: none; padding: 10px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
   .lb-drawer.open { display: block; }
-  .lb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 3px 18px; font-size: 11.5px; }
-  .lb-row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 4px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .lb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 3px 18px; font-size: 11.5px; }
+  .lb-row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.03); }
   .lb-row.us { color: var(--cyan); font-weight: 600; background: rgba(56,189,248,0.08); }
   .lb-row.gold { border-bottom: 1px dashed rgba(245,158,11,0.5); }
 
@@ -91,14 +118,14 @@
   .cols {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-    gap: 24px;
+    gap: 28px;
   }
   @media (max-width: 540px) { .cols { grid-template-columns: 1fr; } }
 
   .col {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
   }
   .col-head {
@@ -108,11 +135,59 @@
     gap: 10px;
   }
   .col-name { font-size: 15px; font-weight: 600; color: var(--text); }
-  .col-proj { font-size: 15px; font-weight: 600; color: var(--green); }
+  .col-proj { font-size: 14px; font-weight: 600; color: var(--green); display: inline-flex; align-items: baseline; gap: 5px; }
+  .col-proj small { font-size: 11px; color: var(--text-3); font-weight: 400; font-family: var(--sans); }
 
-  /* Auto-Layout SVG Circuit (Compact 60px, zero borders) */
-  .circuit { width: 100%; display: block; overflow: visible; }
-  .c-node { cursor: pointer; }
+  /* Unified Frameless Segmented Stage Track (100% Data-Driven, Matches Flat Aesthetic Below) */
+  .track {
+    display: grid;
+    gap: 10px;
+  }
+  .trk-step {
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .trk-rail {
+    height: 2.5px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+  .trk-step.is-done .trk-rail { background: var(--green); }
+  .trk-step.is-active .trk-rail {
+    background: linear-gradient(90deg, rgba(245,158,11,0.25), var(--amber), var(--cyan), rgba(245,158,11,0.25));
+    background-size: 200% 100%;
+    animation: sweepBar 2.8s linear infinite;
+  }
+  .trk-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11.5px;
+  }
+  .trk-l {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .trk-step.is-done .trk-l { color: var(--text-2); }
+  .trk-step.is-active .trk-l { color: var(--text); font-weight: 500; }
+  .trk-r { font-size: 10.5px; color: var(--text-3); flex-shrink: 0; }
+  .trk-step.is-active .trk-r { color: var(--amber); }
+  .trk-step.is-done .trk-r { color: var(--green); }
 
   /* Ultra-Tight Collapsible Progress Tree */
   .tree { border-top: 1px solid var(--line); }
@@ -122,7 +197,7 @@
     background: none;
     border: none;
     color: inherit;
-    padding: 7px 0;
+    padding: 8px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -139,7 +214,7 @@
   .chev { color: var(--text-3); transition: transform .15s; }
   .phase.open .chev { transform: rotate(90deg); }
 
-  .ph-body { display: none; padding: 0 0 7px 22px; }
+  .ph-body { display: none; padding: 0 0 8px 22px; }
   .phase.open .ph-body { display: block; }
 
   .ms { padding: 3px 0; }
@@ -174,7 +249,7 @@
   }
   .st-row {
     display: grid;
-    grid-template-columns: 16px 52px 24px minmax(0, 1fr);
+    grid-template-columns: 16px 54px 22px minmax(0, 1fr);
     align-items: start;
     gap: 7px;
     padding: 4px 5px;
@@ -207,21 +282,34 @@
 <div id="app" class="wrap">
   <header class="bar mono">
     <div class="bar-l">
-      <span style="display:inline-flex;align-items:center;gap:6px;">
-        <svg class="ico" width="10" height="10" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.6" fill="#34d399"/><circle cx="6" cy="6" r="2.6" fill="none" stroke="#34d399" stroke-width="1"><animate attributeName="r" from="2.6" to="5.6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.85" to="0" dur="2s" repeatCount="indefinite"/></circle></svg>
-        <span id="our-rank">—</span>
-        <span class="score-main" id="our-score">—</span>
-        <span class="dim">→</span>
-        <span class="score-proj" id="proj-single">—</span>
-        <span class="score-combo" id="proj-combo"></span>
-      </span>
-      <button class="lb-trigger" id="lb-toggle">
-        <span id="lb-brief">—</span>
-        <svg class="ico chev" id="lb-chev" width="11" height="11" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      <div class="kv">
+        <svg class="ico" width="9" height="9" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.6" fill="#34d399"/><circle cx="6" cy="6" r="2.6" fill="none" stroke="#34d399" stroke-width="1"><animate attributeName="r" from="2.6" to="5.6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.85" to="0" dur="2s" repeatCount="indefinite"/></circle></svg>
+        <span class="kv-k">当前</span>
+        <span class="kv-v" id="our-score">—</span>
+        <span class="kv-sub" id="our-rank"></span>
+      </div>
+      <div class="kv" id="combo-kv">
+        <span class="kv-k">双核预计</span>
+        <span class="kv-v cyan" id="proj-combo">—</span>
+      </div>
+      <div class="kv">
+        <button class="lb-btn" id="lb-toggle" title="点击展开 Top 15 完整榜单">
+          <span class="kv-sub" id="lb-brief">—</span>
+          <svg class="ico chev" id="lb-chev" width="11" height="11" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
+
     <div class="bar-r">
-      <span id="fleet-brief">—</span>
+      <div class="kv">
+        <span class="kv-k">算力</span>
+        <span class="kv-sub" id="cu-val">—</span>
+      </div>
+      <div class="kv">
+        <span class="kv-k">额度</span>
+        <span class="kv-sub" id="quota-val">—</span>
+        <span class="kv-sub" id="reset-val" style="display:inline-flex;align-items:center;gap:3px;color:var(--text-3);" title="距离 08:00 每日重置"></span>
+      </div>
       <div class="seg">
         <button data-mode="macro">总览</button>
         <button data-mode="focus" class="active">聚焦</button>
@@ -325,55 +413,27 @@ function isSubOpen(ms) {
   return ms.status === 'active';
 }
 
-function renderDynamicCircuit(eng, idx) {
+function renderStageTrack(eng) {
   const phases = eng.phases || [];
   if (!phases.length) return '';
-  const n = phases.length;
-  const W = 480, H = 60, padX = 4, gap = 12;
-  const boxW = Math.floor((W - padX * 2 - gap * (n - 1)) / n);
-  const accent = eng.accent === 'indigo' ? '#818cf8' : '#38bdf8';
-  const uid = 'g' + idx + '_' + esc(eng.id || 'e').replace(/[^a-zA-Z0-9]/g, '');
-  const ceiling = eng.ceiling_label || (eng.topology && eng.topology.ceiling_label) || '';
-
-  const nodes = phases.map((ph, i) => {
+  const steps = phases.map(ph => {
     const st = phaseStatus(ph);
-    const x = padX + i * (boxW + gap);
-    const cx = x + boxW / 2;
-    const isOver = Boolean(ceiling) && st === 'active';
-    const y = isOver ? 8 : 16;
-    const h = isOver ? 46 : 38;
-    const label = esc(ph.short_title || shortLabel(ph.title, n >= 4 ? 6 : 8));
+    const label = ph.short_title || shortLabel(ph.title, 8);
     const actId = activeNodeId(ph);
     const msDone = (ph.milestones || []).filter(m => m.status === 'done').length;
     const msTot = (ph.milestones || []).length;
-    const subTxt = st === 'done' ? '✓' : st === 'active' ? (actId || `${msDone}/${msTot}`) : `${msDone}/${msTot}`;
-    const fill = st === 'done' ? 'rgba(52,211,153,0.1)' : st === 'active' ? `url(#${uid}F)` : 'rgba(255,255,255,0.02)';
-    const stroke = st === 'done' ? '#34d399' : st === 'active' ? `url(#${uid}S)` : 'rgba(255,255,255,0.12)';
+    const ico = st === 'done' ? SVG.check(12) : st === 'active' ? SVG.orbit(12) : SVG.idle(11);
+    const rightTxt = st === 'done' ? `${msDone}/${msTot}` : st === 'active' ? (actId || `${msDone}/${msTot}`) : `${msDone}/${msTot}`;
     return `
-      <g class="c-node" data-jump="${esc(ph.id)}">
-        <rect x="${x}" y="${y}" width="${boxW}" height="${h}" rx="7" fill="${fill}" stroke="${stroke}" stroke-width="${st === 'active' ? 1.35 : 1.1}" stroke-dasharray="${st === 'queued' ? '3 3' : ''}"/>
-        ${isOver ? `<path class="drop-hint" d="M${cx - 3.5} 1 L${cx} 5 L${cx + 3.5} 1" fill="none" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
-        <text x="${cx}" y="${y + (isOver ? 21 : 16)}" text-anchor="middle" fill="${st === 'done' ? '#a7f3d0' : st === 'active' ? '#fff' : '#7b8ba3'}" font-size="10" font-weight="${st === 'active' ? 600 : 500}" font-family="ui-monospace,monospace">${label}</text>
-        <text x="${cx}" y="${y + (isOver ? 36 : 30)}" text-anchor="middle" fill="${st === 'done' ? '#34d399' : st === 'active' ? '#fbbf24' : '#526077'}" font-size="8.8" font-family="ui-monospace,monospace">${esc(subTxt)}</text>
-      </g>`;
+      <button class="trk-step is-${st}" data-jump="${esc(ph.id)}">
+        <div class="trk-rail"></div>
+        <div class="trk-meta mono">
+          <span class="trk-l">${ico}<span>${esc(label)}</span></span>
+          <span class="trk-r">${esc(rightTxt)}</span>
+        </div>
+      </button>`;
   }).join('');
-
-  return `
-  <svg class="circuit" viewBox="0 0 ${W} ${H}">
-    <defs>
-      <linearGradient id="${uid}F" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.28"><animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="3.6s" repeatCount="indefinite"/></stop>
-        <stop offset="100%" stop-color="${accent}" stop-opacity="0.14"><animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="3.6s" repeatCount="indefinite"/></stop>
-      </linearGradient>
-      <linearGradient id="${uid}S" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#f59e0b"><animate attributeName="stop-color" values="#f59e0b;${accent};#f59e0b" dur="3.6s" repeatCount="indefinite"/></stop>
-        <stop offset="100%" stop-color="${accent}"><animate attributeName="stop-color" values="${accent};#f59e0b;${accent}" dur="3.6s" repeatCount="indefinite"/></stop>
-      </linearGradient>
-    </defs>
-    ${ceiling ? `<line x1="2" y1="14" x2="${W - 2}" y2="14" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="4 4"/><text x="4" y="10" fill="#38bdf8" font-size="8" font-family="ui-monospace,monospace" opacity="0.75">${esc(ceiling)}</text>` : ''}
-    <line x1="2" y1="35" x2="${W - 2}" y2="35" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-    ${nodes}
-  </svg>`;
+  return `<div class="track" style="grid-template-columns:repeat(${phases.length}, minmax(0, 1fr));">${steps}</div>`;
 }
 
 function render(d) {
@@ -382,23 +442,25 @@ function render(d) {
   const f = d.fleet || {};
   const ourScore = r.our_score ?? f.private_pb_score;
   const digits = ourScore && ourScore < 50 ? 5 : 2;
-  document.getElementById('our-rank').textContent = r.our_rank ? '#' + r.our_rank : (f.private_pb_version || 'PB');
   document.getElementById('our-score').textContent = ourScore != null ? Number(ourScore).toFixed(digits) : '—';
+  document.getElementById('our-rank').textContent = r.our_rank ? `#${r.our_rank}` : (f.private_pb_version || '');
 
-  const sp = (d.single_projection && d.single_projection.score)
-    || (d.engines || []).map(e => e.projected_score).filter(Boolean).join(' / ') || '—';
-  document.getElementById('proj-single').textContent = sp;
   const combo = d.combo_projection && d.combo_projection.score;
-  document.getElementById('proj-combo').textContent = combo ? '合龙 ' + combo : '';
+  if (combo) {
+    document.getElementById('combo-kv').style.display = '';
+    document.getElementById('proj-combo').textContent = combo;
+  } else {
+    document.getElementById('combo-kv').style.display = 'none';
+  }
 
   document.getElementById('lb-brief').textContent = r.rank1
-    ? `#1 ${Number(r.rank1.score).toFixed(digits)} · #3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · #10 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
-    : 'Top 15';
+    ? `榜首 ${Number(r.rank1.score).toFixed(digits)} · Top3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · 金牌线 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
+    : '排行榜';
 
   const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
-  document.getElementById('fleet-brief').innerHTML =
-    `<span>${Number(f.cu_balance || 0).toFixed(0)} CU · ${remQ}/${f.quota_total || 5}</span> ` +
-    `<span style="display:inline-flex;align-items:center;gap:3px;">${SVG.clock(11, true)}${fmtReset(d.reset_in_sec)}</span>`;
+  document.getElementById('cu-val').textContent = `${Number(f.cu_balance || 0).toFixed(0)} CU`;
+  document.getElementById('quota-val').textContent = `${remQ}/${f.quota_total || 5}`;
+  document.getElementById('reset-val').innerHTML = `${SVG.clock(11, true)}${fmtReset(d.reset_in_sec)}`;
 
   document.getElementById('lb-grid').innerHTML = (r.top15 || []).map(row => `
     <div class="lb-row ${row.is_us ? 'us' : ''} ${row.rank === 10 ? 'gold' : ''}">
@@ -407,7 +469,7 @@ function render(d) {
     </div>`).join('');
 
   const container = document.getElementById('engines');
-  container.innerHTML = (d.engines || []).map((eng, idx) => {
+  container.innerHTML = (d.engines || []).map(eng => {
     const phasesHtml = (eng.phases || []).map(ph => {
       const pst = phaseStatus(ph);
       const open = isPhaseOpen(ph, pst);
@@ -473,9 +535,9 @@ function render(d) {
       <section class="col">
         <div class="col-head">
           <span class="col-name">${esc(eng.name)}</span>
-          <span class="col-proj mono">→ ${esc(eng.projected_score || '—')}</span>
+          <span class="col-proj mono"><small>攻克预计</small> ${esc(eng.projected_score || '—')}</span>
         </div>
-        ${renderDynamicCircuit(eng, idx)}
+        ${renderStageTrack(eng)}
         <div class="tree">${phasesHtml}</div>
         ${streamHtml ? `<div class="stream">${streamHtml}</div>` : ''}
       </section>`;
