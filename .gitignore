@@ -1,0 +1,8 @@
+.env
+milestones.json
+radar_latest.json
+score_anomalies.jsonl
+__pycache__/
+*.pyc
+*.tmp
+.DS_Store

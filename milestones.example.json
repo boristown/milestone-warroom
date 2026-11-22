@@ -1,0 +1,356 @@
+{
+  "schema_version": 2,
+  "updated_utc": "2026-01-15T14:30:00Z",
+  "mission_title": "PROJECT HORIZON",
+  "mission_subtitle": "Distributed Kernel Sprint · 实时攻坚战情看板",
+  "policy_badge": "TELEMETRY DEMO · PRIVATE MODE",
+  "fleet": {
+    "cu_balance": 840.5,
+    "cu_burn_per_hr": 8.2,
+    "active_boxes": 3,
+    "max_boxes": 5,
+    "quota_used": 1,
+    "quota_total": 5,
+    "quota_day_utc": "2026-01-15",
+    "private_pb_score": 94.12,
+    "private_pb_version": "v12",
+    "private_pb_ref": "demo-001"
+  },
+  "combo_projection": {
+    "score": "98.8 – 99.4",
+    "delta_vs_pb": "+4.7 ~ +5.3 pts",
+    "label": "双引擎合龙预期"
+  },
+  "single_projection": {
+    "score": "97.5 – 98.4",
+    "delta_text": "较现成绩 +3.4 ~ +4.3 pts",
+    "badge": "直冲 #1"
+  },
+  "engines": [
+    {
+      "id": "engine2",
+      "code": "ENGINE 02",
+      "name": "IR Pipeline Fusion",
+      "owner_line": "Worker A + B · 48 核协同",
+      "accent": "cyan",
+      "projected_score": "97.8+",
+      "projected_delta": "+3.7 pts",
+      "projected_rank": "预计直冲 #1",
+      "target_cost": "<= 12.4ms p99",
+      "current_focus": "2.3a",
+      "bonus_note": "并行加分项（不阻塞合龙）：SIMD 向量化微调 (-0.3ms)",
+      "topology": {
+        "type": "pipeline",
+        "header": "EXECUTION PIPELINE · 3-STAGE FUSED IR",
+        "rail_top": "BUS[64] TENSOR",
+        "rail_bottom": "LATENCY TARGET <= 12.4ms",
+        "right_caption": "→ 97.8+ (#1)",
+        "blocks": [
+          {
+            "title": "前段解析",
+            "sub": "lex · graph · lower",
+            "status_id": "2.3b",
+            "active_fallback_id": "2.3",
+            "jump_phase": "P2-2",
+            "done_label": "✓ 已过验",
+            "active_label": "⚡ 攻坚 2.3a/b",
+            "queued_label": "◎ 待命"
+          },
+          {
+            "title": "中段核心融合",
+            "sub": "zero-copy · 0/0 err",
+            "status_id": "2.2",
+            "jump_phase": "P2-1",
+            "done_label": "✓ 核心已锁定",
+            "active_label": "⚡ 攻坚中",
+            "queued_label": "◎ 待命"
+          },
+          {
+            "title": "后段镜像写出",
+            "sub": "unroll · pack · emit",
+            "status_id": "2.3c",
+            "jump_phase": "P2-2",
+            "done_label": "✓ 零脏位",
+            "active_label": "⚡ 攻坚 2.3c",
+            "queued_label": "◎ 随 2.3c 合龙"
+          }
+        ]
+      },
+      "phases": [
+        {
+          "id": "P2-1",
+          "code": "阶段 01",
+          "title": "架构拆解 & 中段核心验证",
+          "summary_metric": "2/2 完成 · 中段零误差锁定",
+          "projected_unlock": "解锁中段零拷贝能力",
+          "milestones": [
+            {
+              "id": "2.1",
+              "title": "数据流依赖分析 & 接口锁定",
+              "owner": "Worker A+B",
+              "status": "done",
+              "metric": "64-slot clean ABI",
+              "note": "完成前中后三段内存布局对齐",
+              "started_utc": "2026-01-15T10:00:00Z",
+              "completed_utc": "2026-01-15T11:30:00Z"
+            },
+            {
+              "id": "2.2",
+              "title": "中段核心融合算子过验",
+              "owner": "Worker A",
+              "status": "done",
+              "metric": "-18.4% latency · 0 err",
+              "note": "10,000 组随机压力测试零误差通过",
+              "started_utc": "2026-01-15T11:30:00Z",
+              "completed_utc": "2026-01-15T13:10:00Z"
+            }
+          ]
+        },
+        {
+          "id": "P2-2",
+          "code": "阶段 02",
+          "title": "外层重写 & 全链路首次合龙",
+          "summary_metric": "核心攻坚中 · 目标 <= 12.4ms",
+          "projected_unlock": "攻坚落地 → 预计 97.8+ (#1)",
+          "milestones": [
+            {
+              "id": "2.3",
+              "title": "外层零拷贝重排（当前核心卡点）",
+              "owner": "Worker B",
+              "status": "active",
+              "metric": "target 64-slot",
+              "note": "消除中间缓冲拷贝并支持动态分块",
+              "started_utc": "2026-01-15T13:20:00Z",
+              "completed_utc": null,
+              "substeps": [
+                {
+                  "id": "2.3a",
+                  "title": "梳理外层依赖图与分块边界",
+                  "status": "active",
+                  "note": "正在定位剩余 2 处跨块引用",
+                  "started_utc": "2026-01-15T14:05:00Z",
+                  "completed_utc": null
+                },
+                {
+                  "id": "2.3b",
+                  "title": "实现前段零拷贝加载器",
+                  "status": "queued",
+                  "note": "支持可调 tile 宽度",
+                  "started_utc": null,
+                  "completed_utc": null
+                },
+                {
+                  "id": "2.3c",
+                  "title": "实现后段镜像写出并单测全绿",
+                  "status": "queued",
+                  "note": "独立验证 0 误差与零内存泄漏",
+                  "started_utc": null,
+                  "completed_utc": null
+                }
+              ]
+            },
+            {
+              "id": "2.4",
+              "title": "端到端合龙 & 基准压测",
+              "owner": "Worker A+B",
+              "status": "queued",
+              "metric": "<= 12.4ms p99",
+              "note": "输出完整帕累托延迟曲线",
+              "started_utc": null,
+              "completed_utc": null
+            }
+          ]
+        },
+        {
+          "id": "P2-3",
+          "code": "阶段 03",
+          "title": "全量回归 & 发布上线",
+          "summary_metric": "流水线待命 · 约 20 分钟",
+          "projected_unlock": "认证出分 → 97.8+ / 99.4",
+          "milestones": [
+            {
+              "id": "2.5",
+              "title": "多随机种子全量回归验真",
+              "owner": "Commander",
+              "status": "queued",
+              "metric": "3/3 seeds PASS",
+              "note": "确保边界条件零回归",
+              "started_utc": null,
+              "completed_utc": null
+            },
+            {
+              "id": "2.6",
+              "title": "正式打包发布",
+              "owner": "Commander",
+              "status": "queued",
+              "metric": "Release v13",
+              "note": "上线记录正式成绩",
+              "started_utc": null,
+              "completed_utc": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "engine1",
+      "code": "ENGINE 01",
+      "name": "Register Width Compression",
+      "owner_line": "Worker C · 24 核单兵攻坚",
+      "accent": "indigo",
+      "projected_score": "98.4+",
+      "projected_delta": "+4.3 pts",
+      "projected_rank": "预计直冲 #1",
+      "target_cost": "<= 32 Regs Peak",
+      "current_focus": "1.3b",
+      "bonus_note": "二阶段潜力：压缩至 30 寄存器后可解锁双倍吞吐",
+      "topology": {
+        "type": "ceiling",
+        "header": "RESOURCE CEILING · REGISTER BUDGET TOPOLOGY",
+        "ceiling_label": "TARGET CEILING 32 REGS",
+        "bottom_left": "PEAK 34 → 32 REGS",
+        "right_caption": "→ 98.4+ (#1)",
+        "stages": [
+          { "title": "查表压缩", "done_label": "✓ 误差修复", "status_id": "1.1", "jump_phase": "P1-1" },
+          { "title": "SAT 合成", "done_label": "✓ 24核合成", "status_id": "1.2", "jump_phase": "P1-1" }
+        ],
+        "bottleneck": {
+          "title": "峰值寄存器压宽",
+          "over_label": "34 → 32 REGS",
+          "status_id": "1.3b",
+          "parent_id": "1.3",
+          "jump_phase": "P1-2",
+          "done_label": "✓ 已压入目标线",
+          "active_label": "⚡ 攻坚 1.3b"
+        },
+        "output": {
+          "title": "导出制品",
+          "status_id": "1.5",
+          "active_ids": ["1.4", "1.5"],
+          "jump_phase": "P1-3",
+          "done_label": "✓ 已发布",
+          "queued_label": "v13 待命"
+        }
+      },
+      "phases": [
+        {
+          "id": "P1-1",
+          "code": "阶段 01",
+          "title": "算法验证 & 核心子块合成",
+          "summary_metric": "2/2 完成 · 边界溢出已修复",
+          "projected_unlock": "理论成本锁定 98.4+",
+          "milestones": [
+            {
+              "id": "1.1",
+              "title": "新查表公式验证 & 溢出修复",
+              "owner": "Worker C",
+              "status": "done",
+              "metric": "4,096 cases PASS",
+              "note": "修复高位符号扩展边界问题",
+              "started_utc": "2026-01-15T09:00:00Z",
+              "completed_utc": "2026-01-15T11:45:00Z"
+            },
+            {
+              "id": "1.2",
+              "title": "核心子块并行 SAT 合成",
+              "owner": "Worker C",
+              "status": "done",
+              "metric": "V4 patch ready",
+              "note": "完成全部核心逻辑门合成",
+              "started_utc": "2026-01-15T11:45:00Z",
+              "completed_utc": "2026-01-15T13:30:00Z"
+            }
+          ]
+        },
+        {
+          "id": "P1-2",
+          "code": "阶段 02",
+          "title": "压缩最后 2 个峰值寄存器",
+          "summary_metric": "核心攻坚中 · 34 → 32 Regs",
+          "projected_unlock": "攻坚落地 → 预计 98.4+ (#1)",
+          "milestones": [
+            {
+              "id": "1.3",
+              "title": "活跃周期挤压与全链路合体（核心卡点）",
+              "owner": "Worker C",
+              "status": "active",
+              "metric": "34 → 32 Regs",
+              "note": "压掉最后 2 个临时寄存器即可立即导出制品",
+              "started_utc": "2026-01-15T13:30:00Z",
+              "completed_utc": null,
+              "substeps": [
+                {
+                  "id": "1.3a",
+                  "title": "全输入活跃周期 (Liveness) 扫描",
+                  "status": "done",
+                  "note": "已精确定位峰值冲突区间",
+                  "started_utc": "2026-01-15T13:35:00Z",
+                  "completed_utc": "2026-01-15T14:00:00Z"
+                },
+                {
+                  "id": "1.3b",
+                  "title": "复用临时借位寄存器挤出最后 2 槽位",
+                  "status": "active",
+                  "note": "正在验证寄存器重调度方案",
+                  "started_utc": "2026-01-15T14:00:00Z",
+                  "completed_utc": null
+                },
+                {
+                  "id": "1.3c",
+                  "title": "全链路 4,096+ 用例零误差通关",
+                  "status": "queued",
+                  "note": "确认峰值 <= 32 且零残留状态",
+                  "started_utc": null,
+                  "completed_utc": null
+                }
+              ]
+            },
+            {
+              "id": "1.4",
+              "title": "导出制品 & 精确基准核算",
+              "owner": "Worker C",
+              "status": "queued",
+              "metric": "SHA-256 校验",
+              "note": "落盘制品并输出实测开销",
+              "started_utc": null,
+              "completed_utc": null
+            }
+          ]
+        },
+        {
+          "id": "P1-3",
+          "code": "阶段 03",
+          "title": "回归认证 & 正式上线",
+          "summary_metric": "流水线待命 · 约 15 分钟",
+          "projected_unlock": "官方出分 → 98.4+ (#1)",
+          "milestones": [
+            {
+              "id": "1.5",
+              "title": "全量验证 & 正式发布",
+              "owner": "Commander",
+              "status": "queued",
+              "metric": "Release v13",
+              "note": "完成全量验真并提交成绩",
+              "started_utc": null,
+              "completed_utc": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "utc": "2026-01-15T14:00:00Z",
+      "tag": "ENGINE 01",
+      "level": "win",
+      "text": "完成 1.3a 活跃周期扫描，精确定位峰值冲突区间，进入 1.3b 寄存器挤压"
+    },
+    {
+      "utc": "2026-01-15T13:10:00Z",
+      "tag": "ENGINE 02",
+      "level": "win",
+      "text": "打穿 2.2 中段核心融合！延迟直降 18.4%，10,000 组随机压测零误差"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+[Unit]
+Description=Milestone War-Room Live Telemetry Dashboard
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/milestone-warroom
+EnvironmentFile=/opt/milestone-warroom/.env
+ExecStart=/usr/bin/python3 /opt/milestone-warroom/server.py
+Restart=always
+RestartSec=3
+MemoryMax=64M
+CPUQuota=15%
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
