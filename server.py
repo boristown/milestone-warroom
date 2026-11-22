@@ -66,15 +66,28 @@ def parse_status_telemetry(fleet: dict) -> dict:
     return out
 
 
+def dynamic_gold_rank(team_count: int | None) -> int:
+    if not team_count or team_count <= 0:
+        return 17
+    if team_count >= 1000:
+        return 10 + int(team_count * 0.002)
+    if team_count >= 250:
+        return 10
+    return max(1, int(team_count * 0.1))
+
+
 def load_radar_summary(pb_score: float) -> dict:
     summary = {
         "checked_utc": None,
-        "top15": [],
+        "team_count": None,
+        "gold_rank": 17,
+        "in_gold": False,
+        "top20": [],
         "our_rank": None,
         "our_score": pb_score,
         "rank1": None,
         "rank3": None,
-        "rank10": None,
+        "gold_entry": None,
     }
     if not RADAR_FILE or not os.path.exists(RADAR_FILE):
         return summary
@@ -82,7 +95,11 @@ def load_radar_summary(pb_score: float) -> dict:
         with open(RADAR_FILE, "r", encoding="utf-8") as f:
             r = json.load(f)
         summary["checked_utc"] = r.get("checked_utc")
-        for row in (r.get("lb_top", []) or [])[:15]:
+        tc = r.get("team_count")
+        summary["team_count"] = int(tc) if tc else None
+        gold_rank = int(r.get("gold_cutoff_rank") or dynamic_gold_rank(summary["team_count"]))
+        summary["gold_rank"] = gold_rank
+        for row in (r.get("lb_top", []) or []):
             sc = float(row.get("score", 0))
             item = {
                 "rank": int(row.get("rank", 0)),
@@ -90,16 +107,19 @@ def load_radar_summary(pb_score: float) -> dict:
                 "score": sc,
                 "is_us": bool(TEAM_NAME and TEAM_NAME in str(row.get("team", ""))),
             }
-            summary["top15"].append(item)
+            if len(summary["top20"]) < 20:
+                summary["top20"].append(item)
             if item["rank"] == 1:
                 summary["rank1"] = item
             elif item["rank"] == 3:
                 summary["rank3"] = item
-            elif item["rank"] == 10:
-                summary["rank10"] = item
+            if item["rank"] == gold_rank:
+                summary["gold_entry"] = item
             if item["is_us"]:
                 summary["our_rank"] = item["rank"]
                 summary["our_score"] = sc
+        if summary["our_rank"] is not None:
+            summary["in_gold"] = summary["our_rank"] <= gold_rank
     except (OSError, ValueError, json.JSONDecodeError):
         pass
     return summary
@@ -123,7 +143,7 @@ def clean_result_line(content: str) -> tuple[str, str]:
             continue
         lines.append(s)
 
-    fail_pat = re.compile(r"\b(Traceback|Error:|Exception|AssertionError|FAIL|FAILED)\b")
+    fail_pat = re.compile(r"(\bTraceback\b|\bError:|\bERR:|\bException\b|\bAssertionError\b|\bFAIL\b|\bFAILED\b)")
     is_fail = exit_code != 0 or any(fail_pat.search(l) for l in lines[-4:])
     status = "fail" if is_fail else "pass"
 

@@ -443,7 +443,14 @@ function render(d) {
   const ourScore = r.our_score ?? f.private_pb_score;
   const digits = ourScore && ourScore < 50 ? 5 : 2;
   document.getElementById('our-score').textContent = ourScore != null ? Number(ourScore).toFixed(digits) : '—';
-  document.getElementById('our-rank').textContent = r.our_rank ? `#${r.our_rank}` : (f.private_pb_version || '');
+  const rankEl = document.getElementById('our-rank');
+  if (r.our_rank) {
+    rankEl.innerHTML = r.in_gold
+      ? `<span style="color:var(--amber);font-weight:600;">#${r.our_rank} 金牌区</span>`
+      : `#${r.our_rank}`;
+  } else {
+    rankEl.textContent = f.private_pb_version || '';
+  }
 
   const combo = d.combo_projection && d.combo_projection.score;
   if (combo) {
@@ -453,8 +460,11 @@ function render(d) {
     document.getElementById('combo-kv').style.display = 'none';
   }
 
+  const gRank = r.gold_rank || 17;
+  const gEntry = r.gold_entry;
+  const tcTxt = r.team_count ? ` (${r.team_count}队)` : '';
   document.getElementById('lb-brief').textContent = r.rank1
-    ? `榜首 ${Number(r.rank1.score).toFixed(digits)} · Top3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · 金牌线 ${r.rank10 ? Number(r.rank10.score).toFixed(digits) : '--'}`
+    ? `榜首 ${Number(r.rank1.score).toFixed(digits)} · Top3 ${r.rank3 ? Number(r.rank3.score).toFixed(digits) : '--'} · 金牌线 #${gRank} ${gEntry ? Number(gEntry.score).toFixed(digits) : '--'}${tcTxt}`
     : '排行榜';
 
   const remQ = Math.max(0, (f.quota_total || 5) - (f.quota_used || 0));
@@ -462,9 +472,10 @@ function render(d) {
   document.getElementById('quota-val').textContent = `${remQ}/${f.quota_total || 5}`;
   document.getElementById('reset-val').innerHTML = `${SVG.clock(11, true)}${fmtReset(d.reset_in_sec)}`;
 
-  document.getElementById('lb-grid').innerHTML = (r.top15 || []).map(row => `
-    <div class="lb-row ${row.is_us ? 'us' : ''} ${row.rank === 10 ? 'gold' : ''}">
-      <span>#${row.rank} ${esc(row.team)}</span>
+  const lbRows = r.top20 || r.top15 || [];
+  document.getElementById('lb-grid').innerHTML = lbRows.map(row => `
+    <div class="lb-row ${row.is_us ? 'us' : ''} ${row.rank === gRank ? 'gold' : ''}">
+      <span>#${row.rank} ${esc(row.team)}${row.rank === gRank ? ' <small style="color:var(--amber)">金牌线</small>' : ''}</span>
       <span>${Number(row.score).toFixed(digits)}</span>
     </div>`).join('');
 
